@@ -1,0 +1,4 @@
+gradio
+langchain[llms]
+iteration_utilities
+python-dotenv

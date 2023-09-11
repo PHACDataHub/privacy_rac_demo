@@ -84,6 +84,8 @@ experts. Our hypothesis with regard to how they might be made accessible is
 by borrowing techniques that are currently used to teach imperative programming
 to children.
 
+### Experiments To Date
+
 Blawx, a combination of the declarative programming language s(CASP) and
 the user interfaces made available by the Blockly library, is a prototype
 designed to test the above hypotheses. It began to see use in August of 2022
@@ -92,30 +94,6 @@ Experimentation Programme in
 collaboration with other departments of the Government of Canada engaged
 in Rules as Code experimentation. Those projects have included experiments
 both in the regulatory drafting and service automation realms.
-
-### Results To Date
-
-The anecdotal evidence from the use of Blawx in the Canada School of
-Public Service and with their clients over the last year is that it is
-indeed possible to have non-programmers create formalizations of laws and
-regulations in declarative logic languages, and that doing it in Blawx
-results in experiments that accomplish more in less time and with less expense
-than was typical in projects that used other techniques.
-
-With regard to drafting, one experiment in particular has demonstrated that
-if Blawx is used by policy experts, prior to engaging with legislative
-drafters, it leads to objective evidence about the efficacy of proposed rules,
-and insights into the structure and language of those proposed rules that
-would have otherwise been difficult to obtain without involving legislative
-drafting professionals. From the perspective of the policy experts, it gives
-them a better understanding of what they need in a legislative drafting 
-project, and why. From the perspective of the legislative drafters, it makes
-for better-prepared clients. So in the scope of rule design and drafting, the
-encoding process has demonstrated value.
-
-In the automation realm, we have seen that it is possible to use Rules as Code
-encodings created in Blawx to power front-end service automations, both for 
-generating and explaining the answers to legal questions. 
 
 ### Feedback
 
@@ -127,30 +105,75 @@ who integrate the encodings into other applications.
 
 Some of the feedback from legal knowledge engineers is that the nature of
 the natural language explanations provided by Blawx is too verbose, and
-difficult to read. This is certainly the case, and there are opportunities
-to improve upon that.
+difficult to read. Legal knowledge engineers have also provided feedback that
+isomorphism with the structure of a legal text regularly seems to require
+symbolic representation of the idea that a sub-section of legal text that
+does not generate its own legal implications is nevertheless "triggered" by
+a given fact scenario, and that the task of generating these "section X applies"
+type predicates and connecting them to one another according to whether listed
+subsections are conjunctive or disjuctive seems like something that could be
+done automatically for the user.
 
-Here, we
-have discovered that many of the benefits desired by programmers building
-front-end automations that might be possible are not yet provided by Blawx,
-and so we are exploring how those features might be added. Specifically,
-front-end designers are interested not only in natural language expressions
-of rules and explanations, but also for questions that can be posed to users.
-They also require control of whether certain questions get asked, and the
-order in which questions get asked, which are things that a Rules as Code
-encoding can automate in part, but Blawx does not yet provide features for.
+In the task of testing, there is an experience that the current interfaces are
+inadequate, because they separate rules, facts, and questions in such a way as
+to make it difficult for the knowledge engineer to "navigate" through their
+encoding in a natural way. As one simple example, if the answer to a question is
+"no models", the next most obvious step is to ask "why not?" But the test
+interfaces makes changing the question in that way relatively time-consuming.
 
-### Unanswered Questions
+Generally, people who use Blawx find it relatively easy to use at first, but
+there elements of the semantics of the language that are unintuitive, such as
+the fact that the order of conditions can change the result of calculations
+over negated goals.
 
+Participants in experiments prior to the adoption of Blawx are reported to
+have said "if we had done this before it was drafted, it would have been drafted
+better". Anecdotally, that sentiment is shared by the people who have been
+involved in Rules as Code projects using Blawx.
 
+Feedback from policy experts has been that the way that Blawx's answer set
+programming system distinguishes between saying that an input is true, saying
+that it is false, and saying nothing (which is semantically different), is
+suprising to them, and they are not initially clear on the difference in meaning
+between saying that something is false and saying nothing about it. This has
+caused some friction when allowing policy experts to define test cases for
+Blawx encodings.
+
+Feedback from programmers integrating Blawx encodings with front-end applications
+are that they need more information about natural language formulations for
+the elements in the Blawx ontology, including how to pose them as questions to
+users; that the ability of Blawx to calculate the relevance of certain questions
+is valuable; and that their expectation is that Blawx should be able to give
+advice as to the order in which questions should be asked.
+
+In general, it seems that there is a presumption among users - other than
+legally-trained knowledge engineers - that there is enough information in a law
+in order to make useful decisions about the order in which questions should be
+asked. This is not actually the case, as the order in which the questions should
+be asked depends on, initially, the question being asked. And a law doesn't "know"
+what question it is being used to answer. Even in the context of a given goal,
+question order can't be derived from the law alone, because the optimal order
+depends, for example, on whether you are optimizing for asking the fewest questions,
+or for having a system that follows typical conversation patters so as to be
+intuitive. Optimizing for the fewest questions also depends on the likelihood
+that the answer to a question will be determinative, which information doesn't
+exist in the law, either.
+
+There has also been a divide between policy experts and programmers on the one
+hand, and legal knowledge engineers on the other, on the nature of the
+elements of the ontology in Blawx. For legal knowledge engineers, the ontology
+sets out a language that can be used for facts, rules, questions, etc. For the
+users of the law, it is assumed that there is a one-to-one relationship between
+an ontological term, and a "question" that might be posed to a user in a front-
+end application. This is of course not the case, because one predicate can be
+used to express multiple different ideas, and each of those ideas might be posed
+as a question.
 
 ### Blawx
 
 ### Privacy Act
 
-
-
-## Encoding Portions of the Privacy Act in Blawx
+## Demo Part 1: Encoding Portions of the Privacy Act in Blawx
 
 ### Scope of Privacy Act Covered
 
@@ -901,7 +924,7 @@ constradictory conclusions are resolved. We do that using the overrules block.
 
 And that completes the second draft of the encoding. We can now proceed to testing and validating the encoding.
 
-## Testing the Encoding
+## Demo Part 2: Testing the Encoding
 
 For the purpose of illustrating how Blawx can be used to test the behaviour
 of rules, we will go through a number of small tests, and show how these
@@ -1315,11 +1338,195 @@ A portion of the last explanation is shown here:
 
 ![Test 9 Explanation](image-67.png)
 
-## Integrating Blawx with a Conversational Chatbot
+## Demo Part 3: Integrating Blawx with a Conversational Chatbot
 
+This repository includes the code described below for the integration, and
+is designed to be used with Blawx inside a docker compose environment. For
+information on how to run this code yourself, see the installation information
+in the appendix. Note that it will not work unless you provide an OpenAI API
+Key, and have access to the GPT4-0613 model.
+
+### Langchain, and Gradio
+
+This repository relies on the Langchain and Gradio Python libraries.
+
+Langchain is a Python library for building larger automations that depend on
+smaller portions of those automations being performed by LLMs. In this case,
+the demonstration below is done using GPT4-0613. Other models may be sufficient
+for the explanation summary tasks, my experience is that the features of GPT4-0613
+specifically are important to successful integration with Blawx for encoding
+fact scenarios.
+
+Gradio is a python library for quickly and easily generating web-based user
+interfaces for LLM prototypes.
+
+### Design Objective
+
+The objective of this demonstration is to create a conversational chatbot,
+powered by generative AI, that is capable of receiving a question about a
+specific fact scenario in natural language from a user, using a Blawx
+encoding in order to generate an answer to that question, and then summarizing
+the information returned from Blawx for the user.
+
+The anticipated use-case for this work is for the education of public servants
+tasked with adhereing to privacy rules in the maangement of data products.
+There is an increasing push to have data administered less centrally, and shared as a
+product, creating a "data mesh" of available resources. The advantages of
+the data mesh approach are beyond the scope of this document. For our purposes,
+we anticipate that this approach would increase the number of data stewards
+who would be obliged to implement controls in order to maintain compliance with
+privacy requirements. That, in turn, will increase the need for effective
+education of data stewards on, for example, their privacy obligations.
+
+This demonstration is designed to investigate whether it might be possible to
+use a combination of symbolic AI (Blawx) and generative AI (GPT4) to generate
+tools that allow for a natural language interface, but which are able to generate
+accurate, trustworthy, explainable answers to legal questions.
+
+Do to time limitations, it is not possible to generate anything beyond the
+minimally viable prototype of such an application. As such, we are focussed
+primarily on whether the specific technical hurdles associated with both
+symbolic and generative AI can be overcome by using them in combination.
+
+Specifically, symbolic AI representations like those in Blawx are explainable,
+but the explanations tend to be verbose, and unfriendly to humans. One of the
+objectives of this experiment is to see whether combining Blawx and GPT allows
+for a more human-friendly interface to the Blawx encoding.  Similarly,
+generative AI has acknowledged risks with regard to hallucination, particularly
+when dealing with complicated reasoning tasks. Even if generative AI can be
+used to generate accurate answers, and to generate textual explanations for
+those answers, the explanations do not represent the reasoning that was used
+to generate the answer, and there are risks that neither the answer nor the
+explanation are consistent with the rules the generative AI was asked to follow.
+Another objective of this experiment is to see whether the answers generated
+by a conversational AI can be made more reliable by integrating them with a
+symbolic representation of those rules written in Blawx.
+
+Having a generative AI "use" a Blawx encoding requires the generative AI to
+do two things successfully, both of which have typically been difficult for
+generative AI to do. First, the generative AI needs to faithfully translate
+the facts that are provided by the user into the language that is
+available in the symbolic encoding. Second, the generative AI needs to send
+encode this relatively complicated representation in a format consistent with
+the input format expected by the Blawx API, which expects a JSON object.
+
+So the primary objective of this demonstration is to show that it is in fact
+possible to overcome these two obstacles, and that as a result it is possible
+to get the benefits to trustworthiness and legibility that arise from it.
+
+## Insights Gained
+
+The anecdotal evidence from the use of Blawx in the Canada School of
+Public Service and with their clients over the last year is that it is
+indeed possible to have non-programmers create formalizations of laws and
+regulations in declarative logic languages, and that doing so in Blawx
+results in experiments that accomplish more in less time and with less expense
+than was typical in projects that delegated the final coding task to programmers.
+
+With regard to drafting, one experiment in particular has demonstrated that
+if Blawx is used by policy experts, prior to engaging with legislative
+drafters, it leads to objective evidence about the efficacy of proposed rules,
+and insights into the structure and language of those proposed rules that
+would have otherwise been difficult to obtain without involving legislative
+drafting professionals. From the perspective of the policy experts, it gives
+them a better understanding of what they need in a legislative drafting 
+project, and why. From the perspective of the legislative drafters, it makes
+for better-prepared clients. So in the scope of rule design and drafting, the
+encoding process has demonstrated value.
+
+In the automation realm, we have seen that it is possible to use Rules as Code
+encodings created in Blawx to power front-end service automations, both for 
+generating and explaining the answers to legal questions. 
+
+* Blawx has effectively answered the question of whether it is possible for
+  non-programmers to do knowledge representation in sophisticated declarative logic languages. It is clearly possible, and
+  has benefits.
+* The use of exceptions and defaults in Blawx makes it easier to keep encodings
+  structurally isomorphic to their source text, enhancing explainability, and
+  potentially maintainability.
+* The process of encoding legislation in Blawx includes time-consuming steps
+  that could be automated away with sufficiently well-annotated encodings of
+  the source text, particularly with annotations for how sections and sub-sections
+  relate to one another logically, and whether lists are conjunctive or
+  disjunctive.
+* The process of encoding legislation in Blawx is longer than the process of
+  writing code that is capable of answering (e.g.) a single question about the same law.
+  The value of that additional work is not obvious to project participants at the outset of any project
+  that ultimately only requires answers to (e.g.) that a single question. That value may come from re-use of the encoding, or greater confidence that the
+  encoding is legally accurate, or other benefits of Rules as Code, but these
+  are not problems that project participants are used to spending their time
+  and effort solving, so they are opportunities for improvement as opposed to
+  pain relief, and therefore less obvious, and less initially motivating.
+* The interface used for making the task of encoding rules accessible to legal
+  knowledge engineers is not adequate to the task of making code validation
+  accessible to policy experts.
+* The actual use and benefit of a Rules as Code encoding (to provide an isolated,
+  executable encoding of only legal knowledge about a specific law) is not clear
+  to policy experts and programmers who are engaged in a task of automating a particular task
+  on which that law depends.
+* There is a mismatch in expectations between legal knowledge engineers and
+  policy experts and programmers as to what a Rules as Code encoding should be
+  able to do. Effectively, policy experts and programmers expect a rules as code
+  encoding to be capable of generating an expert system. This may be in part due
+  to a lack of a shared understanding between legally trained individuals and
+  others about the semantics of legislation and regulation.
+* The time spend generating encodings is still a risk factor in terms of whether
+  the return on investment for Rules as Code encodings is worth it. People with
+  the knowledge and skill to learn legal knowledge representation are still
+  highly valuable, and the time spent generating encodings is still high.
+  Anything that can be done to minimize that cost is likely to enhance the
+  economic viability of Rules as Code going forward.
+* Modern LLM approaches are capable of effectively summarizing the explanations
+generated by symbolic Rules as Code systems like Blawx, offering a possible path
+to solving the verbosity problem.
+* Modern LLM approaches also appear to be capable of encoding fact scenarios
+described in natural language in a way that is consistent with the ontology and
+data format used in a Blawx encoding, suggesting that there is opportunity to use
+conversational generative AI as a user interface for testing and validation
+purposes, or ultimately in user-facing applications in the future.
+* The Blawx approach seems to be capable of dealing with constraints over time,
+and at least minimally with cause and effect over time through the event calculus. But encodings in the event calculus are considerably less intuitive
+to legal knowledge engineers, and require the generation of a great deal of
+code to represent implicit causal relationships, which frustrates the goal
+of structural isomorphism.
+* Using a quasi-typed representation inside Blawx has advantages for automatically-generated user interfaces for validation and testing, as they
+allow the user to select from among values of the right type, and have the
+correct user interface for that data type.
+* The ontological system is capable of using sub-categories, but unless the
+implications of those ontological rules are available at the front end, it is
+difficult to automate interfaces that understand their implications. For example,
+if all dogs are pets, and people can have pets, a user interface that does not
+have access to the ontological rule "all dogs are pets" cannot conclude that a
+dog described by the user should be available for selection as a pet in another
+statement. This suggests that effective user interfaces may requires access to
+at least a sub-set of the reasoning of the larger encoding in real time.
+
+
+## Unanswered/New Design Questions
+
+* We still don't know whether or not an encoding in Blawx will be computationally
+efficient in the case of, for example, an encoding of an entire statute of
+typical complexity, how its efficiency varies with elements like exceptions, constraints, and abduction, and whether there are effective ways to mitigate
+and computational efficiency issues that might arise in specific use-cases.
+* Is the time spent doing Rules as Code in this way cost effective in view of
+the available alternatives, and taking into account the time required for
+training individuals on legal knowledge representation and validation tasks?
+* How can we build user interfaces and workflows that are aimed more directly
+at code validation by subject matter experts? How more efficient can code
+validation processes become?
+* How can the user interface be improved to better facilitate both validation
+and software testing as an integrated part of the drafting process?
+* Could we use a different approach to defaults and exceptions, relying on
+greater knowledge of the cross-references between sections of the encoding,
+so as to have the encoding process be more structurally isomorphic, without
+sacrificing computational efficiency?
+* Does the lack of shared understanding as to statutory semantics suggest
+that Rules as Code is best done by people with training in statutory interpretation?
 
 ## Conclusions
 
 ## Appendices
+
+### Acknowledgements
 
 ### Installation and Configuration

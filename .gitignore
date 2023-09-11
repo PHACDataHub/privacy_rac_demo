@@ -1,0 +1,5 @@
+.env
+agent/__pycache__/blawxagent.cpython-38.pyc
+agent/__pycache__/blawxagent.cpython-311.pyc
+agent/tools/__pycache__/interview.cpython-38.pyc
+agent/tools/__pycache__/ontology.cpython-38.pyc
