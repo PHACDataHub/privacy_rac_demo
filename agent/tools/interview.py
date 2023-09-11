@@ -58,47 +58,7 @@ class BlawxFacts(BaseModel):
     """
     facts: List[BlawxFact]
 
-class RPSInterview(BaseTool):
-    name = "get_winner_of_rps_game"
-    description = """
-Useful for finding out who won games of rock paper scissors.
-
-Requires you to know the ontology first.
-
-The "type" of each fact should be the string "true", and the "from_ontology" value should be set to boolean false.
-
-Games and players must be defined in category facts before they are used in attribute and relationship facts.
-
-All values should be strings that start with lowercase letters and do not contain spaces.
-
-The facts must only use the category names "game" and "player", the attribute name "participant", and the relationship "throw", which accepts player, sign and game in that order.
-The facts must include statements of what games each player participated in, in addition to statements of what signs they threw in those games.
-
-"""
-
-    def _run(self, facts):
-        return interview({"facts": facts})
-
-    def _arun(self, input):
-        raise NotImplementedError("The get_winner_of_rps_game tool does not support asynchronous requests.")
-
-    args_schema: Optional[Type[BaseModel]] = BlawxFacts
-
-def interview(input):
-  response = requests.post('https://dev.blawx.com/jason/rock-paper-scissors-act/test/who_wins/run/',json=input)
-  package = json.loads(response.text)
-  if len(package['Answers']):
-    return "The winner is " + package['Answers'][0]['Variables']['Player'] + " because " + ''.join(list(deepflatten(package['Answers'][0]['Models'][0]['Tree'])))
-  else:
-    return "There is no answer."
-  
-  class BlawxFacts(BaseModel):
-    """
-    This documents the data structure used by the interview and run endpoints.
-    """
-    facts: List[BlawxFact]
-
-class PIInterview(BaseTool):
+class PAInterview(BaseTool):
     name = "get_pi_for_purposes"
     description = """
 Useful for finding out whether information is personal information for the purposes of section 19 of the
@@ -129,7 +89,7 @@ The facts must use exclusively the category predicates "individual" and "informa
 
 # Try: I have a written record that identifies bob barker as caucasian. Is that private information for the purposes of the Access to Information Act, section 19?
 def privacy_interview(input):
-  response = requests.post('http://localhost:8000/jason/privacy-act/test/pi_for_purposes/run/',json=input)
+  response = requests.post('https://dev.blawx.com/jason/privacy-act/test/pi_for_purposes/run/',json=input)
   #print(response.text)
   package = json.loads(response.text)
   if len(package['Answers']):

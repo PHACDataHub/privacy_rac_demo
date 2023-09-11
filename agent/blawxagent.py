@@ -20,6 +20,6 @@ openai_api_key=os.environ['OPENAI_API_KEY']
 # Because we are using functions, we need to use model gpt-4-0613
 llm=ChatOpenAI(openai_api_key=openai_api_key,temperature=0, model="gpt-4-0613")
 
-tools = [ontology_tool,PIInterview()]
+tools = [ontology_tool,PAInterview()]
 
 agent = initialize_agent(tools, llm, agent=AgentType.OPENAI_FUNCTIONS, verbose=True, agent_kwargs=agent_kwargs, memory=memory)
