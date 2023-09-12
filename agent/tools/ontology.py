@@ -4,9 +4,9 @@ from langchain.agents import Tool
 
 def ontology(input):
   # input is ignored
-  response = requests.get('https://dev.blawx.com/jason/privacy-act/test/pi_for_purposes/onto/')
+  response = requests.get('https://dev.blawx.com/jason/privacy-act/test/permitted_use/onto/')
   package = json.loads(response.text)
-  output = "The categories which take only an object as a paramtere are " + ", ".join(package['Categories']) + ".\n"
+  output = "The categories which take only an object as a parameters are " + ", ".join(package['Categories']) + ".\n"
   output = "The attributes that take only an object are " + ", ".join([(a['Attribute'] + " which applies to an object of category " + a['Category']) for a in package['Attributes'] if a['Type'] == "boolean"]) + ".\n"
   output += "The attributes that take an object and a value are " + ', '.join([(a['Attribute'] + " which applies to an object of category " + a['Category'] + " and accepts a value of type " + a['Type']) for a in package['Attributes'] if a['Type'] != "boolean"]) + '.\n'
   output += "The relationships I know about are "
@@ -22,5 +22,5 @@ def ontology(input):
 ontology_tool = Tool.from_function(
         func=ontology,
         name="Ontology",
-        description="useful for when you need to know the categories, attributes, and relationships available in the pi_for_purposes tool. Does not require input."
+        description="useful for when you need to know the categories, attributes, and relationships available in the permitted_uses tool. Does not require input."
     )

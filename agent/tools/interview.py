@@ -59,38 +59,32 @@ class BlawxFacts(BaseModel):
     facts: List[BlawxFact]
 
 class PAInterview(BaseTool):
-    name = "get_pi_for_purposes"
+    name = "permitted_uses"
     description = """
-Useful for finding out whether information is personal information for the purposes of section 19 of the
-Access to Information Act.
+Useful for finding out whether a use of information is permitted under the Privacy Act.
 
 Requires you to know the ontology first.
 
 The "type" of each fact should be the string "true", and the "from_ontology" value should be set to boolean false.
 
-Pieces of information and individuals must be defined in category facts before they are used in attribute and relationship facts.
+Pieces of information, individuals, government institutions and purposes must be defined in category facts before they are used in attribute and relationship facts.
 
 All values should be strings that start with lowercase letters and do not contain spaces.
 
-The facts must use exclusively the category predicates "individual" and "information", and the attribute predicates
-"about", "recorded", "about_identifiable_individual", "relates_to_race_of", and "date_of_death".
-
-"about_identifiable_individual" is a unary predicate for which a value should not be provided.
-
+The facts must exclusively use the category, attribute, and relationship predicates set out in the ontology.
+Values should not be provided for boolean attributes.
 """
 
     def _run(self, facts):
         return privacy_interview({"facts": facts})
 
     def _arun(self, input):
-        raise NotImplementedError("The get_pi_for_purposes tool does not support asynchronous requests.")
+        raise NotImplementedError("The permitted_uses tool does not support asynchronous requests.")
 
     args_schema: Optional[Type[BaseModel]] = BlawxFacts
 
-# Try: I have a written record that identifies bob barker as caucasian. Is that private information for the purposes of the Access to Information Act, section 19?
 def privacy_interview(input):
-  response = requests.post('https://dev.blawx.com/jason/privacy-act/test/pi_for_purposes/run/',json=input)
-  #print(response.text)
+  response = requests.post('https://dev.blawx.com/jason/privacy-act/test/permitted_uses/run/',json=input)
   package = json.loads(response.text)
   if len(package['Answers']):
     return "I should use only the following information to answer the question: " + package['Answers'][0]['Variables']['A'] + " is personally identifying information for the purposes of section 19 of the AITA because " + ''.join(list(deepflatten(package['Answers'][0]['Models'][0]['Tree'])))
