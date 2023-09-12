@@ -5,6 +5,7 @@ from langchain.agents import Tool
 def ontology(input):
   # input is ignored
   response = requests.get('https://dev.blawx.com/jason/privacy-act/test/permitted_use/onto/')
+  #print(response)
   package = json.loads(response.text)
   output = "The categories which take only an object as a parameters are " + ", ".join(package['Categories']) + ".\n"
   output = "The attributes that take only an object are " + ", ".join([(a['Attribute'] + " which applies to an object of category " + a['Category']) for a in package['Attributes'] if a['Type'] == "boolean"]) + ".\n"
