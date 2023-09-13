@@ -1502,9 +1502,10 @@ from langchain.agents import Tool
 
 def ontology(input):
   # input is ignored
-  response = requests.get('https://dev.blawx.com/jason/privacy-act/test/pi_for_purposes/onto/')
+  response = requests.get('https://dev.blawx.com/jason/privacy-act/test/permitted_use/onto/')
+  #print(response)
   package = json.loads(response.text)
-  output = "The categories which take only an object as a paramtere are " + ", ".join(package['Categories']) + ".\n"
+  output = "The categories which take only an object as a parameters are " + ", ".join(package['Categories']) + ".\n"
   output = "The attributes that take only an object are " + ", ".join([(a['Attribute'] + " which applies to an object of category " + a['Category']) for a in package['Attributes'] if a['Type'] == "boolean"]) + ".\n"
   output += "The attributes that take an object and a value are " + ', '.join([(a['Attribute'] + " which applies to an object of category " + a['Category'] + " and accepts a value of type " + a['Type']) for a in package['Attributes'] if a['Type'] != "boolean"]) + '.\n'
   output += "The relationships I know about are "
@@ -1520,7 +1521,7 @@ def ontology(input):
 ontology_tool = Tool.from_function(
         func=ontology,
         name="Ontology",
-        description="useful for when you need to know the categories, attributes, and relationships available in the pi_for_purposes tool. Does not require input."
+        description="useful for when you need to know the categories, attributes, and relationships available in the permitted_uses tool. Does not require input."
     )
 ```
 
@@ -1563,41 +1564,49 @@ The PAInterview and privacy interview definitions are quoted here in their entir
 
 ```python
 class PAInterview(BaseTool):
-    name = "get_pi_for_purposes"
+    name = "permitted_uses"
     description = """
-Useful for finding out whether information is personal information for the purposes of section 19 of the
-Access to Information Act.
+Useful for finding out whether a use of information is permitted under the Privacy Act.
 
 Requires you to know the ontology first.
 
 The "type" of each fact should be the string "true", and the "from_ontology" value should be set to boolean false.
 
-Pieces of information and individuals must be defined in category facts before they are used in attribute and relationship facts.
+Pieces of information, individuals, government institutions and purposes must be defined in category facts before they are used in attribute and relationship facts.
 
-All values should be strings that start with lowercase letters and do not contain spaces.
+All text values should be strings that start with lowercase letters and do not contain spaces.
 
-The facts must use exclusively the category predicates "individual" and "information", and the attribute predicates
-"about", "recorded", "about_identifiable_individual", "relates_to_race_of", and "date_of_death".
+The facts must exclusively use the category, attribute, and relationship predicates set out in the ontology.
+Values should not be provided for boolean attributes.
 
-"about_identifiable_individual" is a unary predicate for which a value should not be provided.
+If an entity is described as a government entity, include it in both the "entity" and "government_institution"
+categories.
 
+If there is an information, also specify in the facts that it is recorded.
+
+Encode only facts that were obtained from the user. Do not encode facts derived from previous answers.
 """
 
     def _run(self, facts):
         return privacy_interview({"facts": facts})
 
     def _arun(self, input):
-        raise NotImplementedError("The get_pi_for_purposes tool does not support asynchronous requests.")
+        raise NotImplementedError("The permitted_uses tool does not support asynchronous requests.")
 
     args_schema: Optional[Type[BaseModel]] = BlawxFacts
 
 def privacy_interview(input):
-  response = requests.post('https://dev.blawx.com/jason/privacy-act/test/pi_for_purposes/run/',json=input)
+  response = requests.post('https://dev.blawx.com/jason/privacy-act/test/permitted_use/run/',json=input)
+  #print(response.text)
   package = json.loads(response.text)
   if len(package['Answers']):
-    return "I should use only the following information to answer the question: " + package['Answers'][0]['Variables']['A'] + " is personally identifying information for the purposes of section 19 of the AITA because " + ''.join(list(deepflatten(package['Answers'][0]['Models'][0]['Tree'])))
+    explanation = ''.join(list(deepflatten(package['Answers'][0]['Models'][0]['Tree'])))
+    gch = explanation.find('The global constraints hold')
+    if gch:
+       explanation = explanation[:gch]
+    return "I should use only the following information to answer the question: " + package['Answers'][0]['Variables']['Info'] + " can be used by " + package['Answers'][0]['Variables']['Inst'] + " for the purpose of " + package['Answers'][0]['Variables']['Purpose'] + " because "  + explanation
   else:
-    return "I should use only the following information to answer the question: There is no evidence based on these facts to conclude that anything is personally identifying information for the purposes of section 19 of the AITA."
+    return "I should use only the following information to answer the question: There is no evidence based on these facts to conclude that there is any permitted use of information under the AITA."
 ```
 
 ### Experimental Results
