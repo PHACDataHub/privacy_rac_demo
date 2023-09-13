@@ -1602,9 +1602,104 @@ def privacy_interview(input):
 
 ### Experimental Results
 
-TODO:
-* despite being told not to, it is still recording facts that correspond to the thing being searched.
-* there are problems with the global constraints making the explanation too long.
+Running the above code, and observing the behaviour of the agent, we can ask questions of the chatbot and
+see how it generates the answers for those questions. The following question is posed:
+
+```
+if the government tax agency collects bob's income information for calculating his taxes, what information uses are permitted?
+```
+
+Observing the agent's debugging log, the first step the agent takes is to retrieve the available ontology.
+Once it has done that, it attempts to use the interview endpoint to find an answer to the question, encoding
+the facts of the question in the following object:
+
+```
+{'facts': [
+  {'from_ontology': False, 'type': 'true', 'category': 'individual', 'object': 'bob'},
+  {'from_ontology': False, 'type': 'true', 'category': 'information', 'object': 'income_information'},
+  {'from_ontology': False, 'type': 'true', 'category': 'government_institution', 'object': 'tax_agency'},
+  {'from_ontology': False, 'type': 'true', 'category': 'purpose', 'object': 'calculating_taxes'},
+  {'from_ontology': False, 'type': 'true', 'attribute': 'recorded', 'object': 'income_information'},
+  {'from_ontology': False, 'type': 'true', 'attribute': 'identifiably_about', 'object': 'income_information', 'value': 'bob'},
+  {'from_ontology': False, 'type': 'true', 'attribute': 'under_control_of', 'object': 'income_information', 'value': 'tax_agency'},
+  {'from_ontology': False, 'type': 'true', 'attribute': 'collection_purpose', 'object': 'income_information', 'value': 'calculating_taxes'}
+]}
+```
+
+This object adheres to the JSON schema provided, and follows the instructions provided in the prompt. It also
+accurately encodes the facts in the question in the ontology provided, using only the relevant elements of
+the ontology, despite the fact there were many more terms available in the ontology. It also does this despite
+having been provided no information about what the terms in the ontology mean, except that which can be
+implied by their names and the types of their parameters. It seems likely that the performance on such tasks
+can be improved in a number of ways, but a very naive approach also succeeds.
+
+The interview tool returns and answer, and reformats the explanation returning that as text to the agent,
+which then summarizes it as follows:
+
+```
+The government tax agency is permitted to use Bob's income information for the purpose of calculating his taxes. This is because the income information is personal information relating to Bob, it is recorded in any form, and it is under the control of the tax agency. Furthermore, the income information was collected for the purpose of calculating taxes. Please note that this use is permitted under section 7 of the Privacy Act.
+```
+
+This is an accurate summary of the text of the explanation received from the Blawx server. With additional work
+it would seem to be possible to give the user the ability to ask questions about the explanation itself, and
+give the user the option of viewing the raw explanation as provided by the Blawx server as part of the interface.
+
+The test interface for this exchange looks like this:
+
+![Chatbot Answer 1](image-68.png)
+
+Currently no information is provided to the user about what steps the agent is following, but this
+is also clearly feasible to add, as is currently done in agent-based tools like Microsoft's Bing Chat.
+
+Because the agent has conversational memory, we can ask another question that proposed to modify the
+facts slightly, without having to restate anything.  For instance, we can now ask:
+
+```
+what if bob died on january 1, 2000?
+```
+
+Viewing the log, the agent again seeks the ontology, which it ideally would not do repeatedly. It then
+generates the following encoding of facts and sends it to the Blawx server:
+
+```
+{'facts': [
+  {'from_ontology': False, 'type': 'true', 'category': 'individual', 'object': 'bob'}, 
+  {'from_ontology': False, 'type': 'true', 'category': 'information', 'object': 'income_information'}, 
+  {'from_ontology': False, 'type': 'true', 'category': 'government_institution', 'object': 'tax_agency'}, 
+  {'from_ontology': False, 'type': 'true', 'category': 'purpose', 'object': 'calculating_taxes'}, 
+  {'from_ontology': False, 'type': 'true', 'attribute': 'date_of_death', 'object': 'bob', 'value': '2000-01-01'}, 
+  {'from_ontology': False, 'type': 'true', 'attribute': 'identifiably_about', 'object': 'income_information', 'value': 'bob'}, 
+  {'from_ontology': False, 'type': 'true', 'attribute': 'under_control_of', 'object': 'income_information', 'value': 'tax_agency'}, 
+  {'from_ontology': False, 'type': 'true', 'attribute': 'collection_purpose', 'object': 'income_information', 'value': 'calculating_taxes'}, 
+  {'from_ontology': False, 'type': 'true', 'relationship': 'permitted_user_purpose', 'parameter1': 'income_information', 'parameter2': 'tax_agency', 'parameter3': 'calculating_taxes'}
+]}
+```
+
+The agent has made a couple of mistakes, this time, and the answer received is therefore incorrect. But
+interestingly, the mistakes seem to be of the nature that agent is encoding facts which were previously
+derived, and assuming that they remain true in the new scenario. It has correctly encoded bob's date of
+death. It has also correctly included all of the facts that were previously provided by the user.
+It has also encoded both the idea
+that the information is personally identifying with regard to bob, and that the tax agency is permitted
+to use it for calculating bob's taxes, both of which are facts that were true in the explanation to the
+first question. It has used the ontology correctly, and the encoding is formatted into the JSON object
+properly. But it has encoded these facts  despite the prompt instructing it not.
+
+The effect of doing this means that the agent has given the Blawx server the answer to the question it
+is asking, and the blawx server essentially replies that the tax agency can use the information because
+the user said so.  The text generated in the interface combines this with
+the previously known information to generate the following answer:
+
+![Chatbot answer 2](image-69.png)
+
+This is not a problem of the agent failing to accurately generate the JSON object, nor it is
+a problem of the agent not accurately encoding the facts using the ontology. It is a problem of the agent
+knowing which facts to encode, and which not to. That is a less complicated question, and likely tractable
+with prompt engineering tactics. So the basic question we are seeking to answer is answered in the
+affirmative: GPT4-0613 is capable of using the Blawx API, and it is capable of accurately encoding facts
+provided in natural language using a provided ontology, and it is capable of providing readable summaries
+of the explanations provided by the Blawx reasoner. The limits of those capabilities are not clear, but
+the purpose of this experiment is only begin that exploration.
 
 ## Insights Gained
 

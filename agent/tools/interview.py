@@ -79,8 +79,7 @@ categories.
 
 If there is an information, also specify in the facts that it is recorded.
 
-Do not use the "identifiably_about" attribute, or "permitted_user_purpose" relationship, as these should be
-derived from other facts.
+Encode only facts that were obtained from the user. Do not encode facts derived from previous answers.
 """
 
     def _run(self, facts):
@@ -98,8 +97,8 @@ def privacy_interview(input):
   if len(package['Answers']):
     explanation = ''.join(list(deepflatten(package['Answers'][0]['Models'][0]['Tree'])))
     gch = explanation.find('The global constraints hold')
-    if ghc:
-       explanation = explanation[:ghc]
+    if gch:
+       explanation = explanation[:gch]
     return "I should use only the following information to answer the question: " + package['Answers'][0]['Variables']['Info'] + " can be used by " + package['Answers'][0]['Variables']['Inst'] + " for the purpose of " + package['Answers'][0]['Variables']['Purpose'] + " because "  + explanation
   else:
     return "I should use only the following information to answer the question: There is no evidence based on these facts to conclude that there is any permitted use of information under the AITA."
