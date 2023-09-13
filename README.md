@@ -1602,7 +1602,9 @@ def privacy_interview(input):
 
 ### Experimental Results
 
-
+TODO:
+* despite being told not to, it is still recording facts that correspond to the thing being searched.
+* there are problems with the global constraints making the explanation too long.
 
 ## Insights Gained
 

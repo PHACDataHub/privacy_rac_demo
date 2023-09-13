@@ -77,6 +77,8 @@ Values should not be provided for boolean attributes.
 If an entity is described as a government entity, include it in both the "entity" and "government_institution"
 categories.
 
+If there is an information, also specify in the facts that it is recorded.
+
 Do not use the "identifiably_about" attribute, or "permitted_user_purpose" relationship, as these should be
 derived from other facts.
 """
