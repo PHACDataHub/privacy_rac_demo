@@ -96,6 +96,10 @@ def privacy_interview(input):
   #print(response.text)
   package = json.loads(response.text)
   if len(package['Answers']):
-    return "I should use only the following information to answer the question: " + package['Answers'][0]['Variables']['Info'] + " can be used by " + package['Answers'][0]['Variables']['Inst'] + " for the purpose of " + package['Answers'][0]['Variables']['Purpose'] + " because "  + ''.join(list(deepflatten(package['Answers'][0]['Models'][0]['Tree'])))
+    explanation = ''.join(list(deepflatten(package['Answers'][0]['Models'][0]['Tree'])))
+    gch = explanation.find('The global constraints hold')
+    if ghc:
+       explanation = explanation[:ghc]
+    return "I should use only the following information to answer the question: " + package['Answers'][0]['Variables']['Info'] + " can be used by " + package['Answers'][0]['Variables']['Inst'] + " for the purpose of " + package['Answers'][0]['Variables']['Purpose'] + " because "  + explanation
   else:
     return "I should use only the following information to answer the question: There is no evidence based on these facts to conclude that there is any permitted use of information under the AITA."
