@@ -250,7 +250,7 @@ of the law is converted into a set of section selector blocks, referring to one
 section of the law. The user then generates rules using the "attributed rule block"
 which is pre-populated with the name of the current section, and appears as follows:
 
-![Attributed Rule Block](image-71.png)
+![Attributed Rule Block](images/image-71.png)
 
 When the user uses this block, three rules are generated in the s(CASP) language.
 The first asserts that if the conditions hold, the conclusion defeasibly holds
@@ -261,7 +261,7 @@ that if the conclusion holds indefeasibly according to the section, then the
 statement by itself is true.
 
 For example, the following block...
-![Mortality Rule](image-72.png)
+![Mortality Rule](images/image-72.png)
 ... would generate the following s(CASP) code:
 ```
 according_to(sec_1_section,mortal,A) :- human(A).
@@ -316,7 +316,7 @@ Now that the rule is subject to exceptions, the user can use an "overrules" bloc
 to indicate how conflicts between defeasible conclusions should be resolved. An
 example might be as follows:
 
-![Overrules Block](image-73.png)
+![Overrules Block](images/image-73.png)
 
 That block generates the following s(CASP) code:
 ```
@@ -423,7 +423,7 @@ presumption either in favour or against applicability, and then deriving the
 opposite conclusion in the appropriate circumstances.  Here is an example of
 a presumption of applicability for section 1.
 
-![Presumption of Applicability](image-75.png)
+![Presumption of Applicability](images/image-75.png)
 
 You will note that the presumption uses two different kinds of negation. This
 is a feature of the open world reasoning of answer set programming that
@@ -573,7 +573,7 @@ The Blawx block language contains blocks that allows the user to:
 * Combine a date and time to create a datetime
 * Generate a date, time, datetime, or duration from a number
 
-![Date Blocks](image-76.png)
+![Date Blocks](images/image-76.png)
 
 #### CLEAN
 
@@ -691,7 +691,7 @@ would be the question of whether any of the people the information was "about", 
 And there was no indication that we needed to know which, because "personal" is being applied to "information",
 which I took to refer to the data.
 
-![Image of first draft of rule](image1.png)
+![Image of first draft of rule](images/image1.png)
 
 #### Encoding Section 3(7)(a)
 
@@ -708,7 +708,7 @@ As such, I copied the rule from 7, and added the requirement that the informatio
 relates in that way to the person the information is about. One such rule was
 created for each of the several possible things to which the information could relate. A similar approach was taken for all of the paragraphs below.
 
-![Image of first draft of a rule in 7(a)](image.png)
+![Image of first draft of a rule in 7(a)](images/image.png)
 
 #### Encoding Section 3(7)(b)
 
@@ -718,7 +718,7 @@ b) information relating to the education or the medical, criminal or employment 
 
 Paragraph (7)(b) was encoded in much the same way, setting out an additional 5 "related to" properties for information, and duplicating the rules similarly.
 
-![Image of draft of a rule in 7(b)](image-1.png)
+![Image of draft of a rule in 7(b)](images/image-1.png)
 
 #### Encoding Section 3(7)(c)
 
@@ -735,7 +735,7 @@ information "includes" these identifiers, because that's not what the rule says.
 Again, because the reference is to "the individual", the requirement is not that the information identifies anyone, but that it identifies at least one person that
 the information is "about". So the rule was drafted as follows, with three copies for the three attributes.
 
-![Image of draft of a rule in 7(c)](image-2.png)
+![Image of draft of a rule in 7(c)](images/image-2.png)
 
 #### Encoding Section 3(7)(d)
 
@@ -746,7 +746,7 @@ d) the address, fingerprints or blood type of the individual,
 This section was encoded in much the way section c) was encoded. Three attributes saying that the information "is" the address, fingerprints, or blood type of a given individual, and then adding the requirement in the rule that one
 of those hold true for an individual the information is about.
 
-![Alt text](image-3.png)
+![Alt text](images/image-3.png)
 
 #### Encoding Section 3(7)(e)
 
@@ -771,7 +771,7 @@ The first part was encoded by adding an attribute to information called "is_opin
 
 The rule was encoded with the requirement that the information be the personal opinion of the person the information is about, but because of the exception this rule was set to be subject to exceptions.
 
-![Alt text](image-4.png)
+![Alt text](images/image-4.png)
 
 ##### Encoding Section 3(7)(e), exception
 
@@ -789,14 +789,14 @@ So it is no longer enough for us to know that the information is an opinion of a
 As such I created a 3-ary relationship called "personal_opinion_on_person", between an information and two individuals. In order to be sure to relate the
 relationship to the previous predicate, I created an unattributed rule to assert that if an information was an opinion of A about anyone, it was an opinion of A's.
 
-![Ontology in 7(e) exception, first part](image-5.png)
+![Ontology in 7(e) exception, first part](images/image-5.png)
 
 Then it was necessary to contradict the conclusion in the default, and to have the current section's conclusion override the default.
 So I created a rule that when an information is the opinion of A on B, and when
 A and B are not the same object (to represent the word "another" in "another individual")
 then it is false that the information is personal information.
 
-![rule in 7(e) exception, first part](image-6.png)
+![rule in 7(e) exception, first part](images/image-6.png)
 
 This was problematic, because a piece of information could be personal
 information about more than one person, and it would not cease to be personal
@@ -810,9 +810,9 @@ As such it seemed like this is more properly understood as an exclusion of appli
 Blawx has features for applicability, so the root of (e) was changed to make it
 subject to applicability, not to exceptions.
 
-![Applicability version of e](image-8.png)
+![Applicability version of e](images/image-8.png)
 
-![Applicability version of 7(e) exception first part](image-7.png)
+![Applicability version of 7(e) exception first part](images/image-7.png)
 
 The Blawx applicability method requires that a value be set for applicability
 explicitly for all elements, so it was necessary to encode a default rule that would make section e apply unless the exception made that false. That presumption
@@ -825,7 +825,7 @@ to place the presumption with the non-applicability rules, because that is the
 point at which the need for them becomes obvious. If there is more than one
 exception it can be more coherent to place the presumption with the rule.
 
-![Default applicability for 7(e)](image-9.png)
+![Default applicability for 7(e)](images/image-9.png)
 
 ###### Encoding Section 3(7)(e), exception, second part
 
@@ -845,7 +845,7 @@ Because this section is referring to messages to and from governments and indivi
 the category "entity", and the category "correspondence", and the category "government_institution". I also created two ontological rules, shown below,
 indicating that both individuals and government institutions are entities.
 
-![Ontological Rules in 7(f)](image-10.png)
+![Ontological Rules in 7(f)](images/image-10.png)
 
 I then created four attributes for correspondence: sender, and recipient refer to entities. The attribute
 "is_private" is a boolean that refers to "implicitly or explicitly of a private or
@@ -861,13 +861,13 @@ Noting that the rule requires only "sent to" and not "received by", the blocks f
 the sender and receiver attributes read "X was sent by Y" and "X was sent to Y",
 respectively.
 
-![First part of rule in 7(f)](image-11.png)
+![First part of rule in 7(f)](images/image-11.png)
 
 The rule about replies was encoded in much the same way, but adding the requirement
 that the original is also a correspondence, the information is a revealing reply
 to the original, and the other requirements are true of the original.
 
-![Rule about replies in 7(f)](image-12.png)
+![Rule about replies in 7(f)](images/image-12.png)
 
 #### Encoding Section 3(7)(g)
 
@@ -934,9 +934,9 @@ We are combining that requirement into the requirement that the information be "
 
 If we return to the main section of the definition, we have the following ontology and rule.
 
-![New definition ontology](image-13.png)
+![New definition ontology](images/image-13.png)
 
-![New definition rule](image-14.png)
+![New definition rule](images/image-14.png)
 
 #### Re-Encoding Sections 3(7)(a-f)
 
@@ -944,7 +944,7 @@ Now we can re-write the rules in the sub-definitions accordingly.  It is still t
 
 Here is an example of the re-written rule for paragraph (a):
 
-![second draft paragraph a part](image-15.png)
+![second draft paragraph a part](images/image-15.png)
 
 The rest of the code above was modified in a corresponding way.
 
@@ -958,7 +958,7 @@ g) the views or opinions of another individual about the individual
 
 This is easily specified by requiring that there be two individuals, that they are different, and that the "Person" is the subject of the opinion.
 
-![definition g rule](image-16.png)
+![definition g rule](images/image-16.png)
 
 #### Re-Encoding Section 3(7)(e), exception, second part
 
@@ -1010,7 +1010,7 @@ stating that information that is an opinion on a proposal is also an opinion.
 
 Those decisions made, the ontology looks like this:
 
-![rule e exception second part ontology](image-18.png)
+![rule e exception second part ontology](images/image-18.png)
 
 Now we need to encode the idea that section e of the definition does not apply
 to information of this type. The requirements are that there is info, the info
@@ -1021,7 +1021,7 @@ those requirements are met then the rule in the main part of e does not apply.
 Note that it is not necessary to restate the presumption that we already have
 in this section.
 
-![definition e exception second part rule](image-19.png)
+![definition e exception second part rule](images/image-19.png)
 
 #### Encoding Section 3(7)(h)
 
@@ -1067,7 +1067,7 @@ to override it with regard to the conclusion of any given section of the law,
 so the exceptions system is not what we need. Instead, we will encode a
 presumption which is true unless it is false, using an unattributed rule.
 
-![ontological part of h](image-22.png)
+![ontological part of h](images/image-22.png)
 
 Now we can model "excluding the name of the other individual where it appears with the views or opinions of the other individual" by saying that the presumption does not apply to the name of the opiner when it is contained in an opinion. We are basically guessing as to the meaning of "appears with" being
 equivalent to "contained in".
@@ -1076,13 +1076,13 @@ We therefore need two rules, one making the opinion personal information about t
 
 The first part is almost identical to the exception in e, but with a different conclusion and section. 
 
-![definition h rule default](image-21.png)
+![definition h rule default](images/image-21.png)
 
 Now the rule is mostly duplicated, with the addition of a second piece of information, which is contained by the first, is the opiner's name, and the
 conclusion is changed to logically falsify that the second information is
 personal information regarding the grantee.
 
-![definition h rule exception](image-24.png)
+![definition h rule exception](images/image-24.png)
 
 ##### Disjunctive "and"
 
@@ -1112,7 +1112,7 @@ It is impossible, in our ontology, for a piece of information to be revealing
 with regard to an individual, and for it not to also be "about" that person.
 We can therefore include an ontological rule making that implication.
 
-![definition i ontology](image-26.png)
+![definition i ontology](images/image-26.png)
 
 Now we can create the two disjunctive rules that make names personal information. The first is that a name is personal information if it appears
 with other personal information. We can model "appears with" in the same
@@ -1120,7 +1120,7 @@ way that we did for (h), asking whether it is contained in information
 which is also personal with regard to the same person. Following the pattern
 used elsewhere, we get this rule:
 
-![definition i rule one](image-27.png)
+![definition i rule one](images/image-27.png)
 
 Some of these statements seem redundant, but may not be. For instance it seems
 redundant to say that a name is personally identifying about "a person". But
@@ -1199,7 +1199,7 @@ that personal information generally is also personal information for section 7,
 and turn that into an attributed rule. We will attribute that rule to the (7.1)
 section, and indicate that the rule is subject to exceptions.
 
-![7.1 default](image-28.png)
+![7.1 default](images/image-28.png)
 
 Now we need to describe the exception in (m).
 
@@ -1211,7 +1211,7 @@ m) information about an individual who has been dead for more than twenty years;
 
 The one element we need to add to the ontology to describe this rule is that individuals have dates of death.
 
-![m ontology](image-29.png)
+![m ontology](images/image-29.png)
 
 Now we need to make a rule that contradicts the rule in 7.1 for people who have
 been dead for more than 20 years.
@@ -1234,13 +1234,13 @@ doesn't cooperate very well with units that are of inconsistent size, such as ye
 The ability to deal effectively with years and months may be added again in
 the future.
 
-![exception in m](image-30.png)
+![exception in m](images/image-30.png)
 
 Now we have created a rule that comes to a contradictory conclusion to the rule in 7.1, which we indicated was subject to exceptions. In order for Blawx to know
 which of these conclusions should "win", we need to be explicit about the overriding relationship between them.  That is done using the overrules block,
 as follows.
 
-![overrules in m](image-31.png)
+![overrules in m](images/image-31.png)
 
 Now Blawx knows everything that it needs to know in order to resolve a conflict between the two conclusions if they would otherwise both hold.
 
@@ -1271,7 +1271,7 @@ indicating that an entity is permitted to use an information for a purpose.
 
 The ontology looks like this:
 
-![Section 7 Ontology](image-32.png)
+![Section 7 Ontology](images/image-32.png)
 
 We can see from the word "except" that this section is describing a default
 that will be overruled in the following sections, so we will use Blawx's
@@ -1289,13 +1289,13 @@ we need to create a rule that makes that implication possible.
 We need to remember to use the "for the purposes of section 7" version of
 the personal information attribute.
 
-![Section 7 Rule 1](image-39.png)
+![Section 7 Rule 1](images/image-39.png)
 
 Note that only this rule is set to be subject to exceptions, because the exceptions
 seem to be designed to set out cases only where use is permitted, never to find
 cases where it is not despite consent.
 
-![Section 7 Rule 2](image-40.png)
+![Section 7 Rule 2](images/image-40.png)
 
 Now we will encode the exception in 7(a).
 
@@ -1315,7 +1315,7 @@ separately. For the sake of simplicity, we will unify the two ideas as one,
 call it purpose, not model uses directly, and instead ask whether purposes
 are consistent with one another.
 
-![Section 7(a) ontology](image-35.png)
+![Section 7(a) ontology](images/image-35.png)
 
 Note that just because we are not modelling the concept of a "use" separately
 inside the ontology doesn't mean that it is excluded in our model. But it
@@ -1327,14 +1327,14 @@ institution can use information if the use is for the purpose for which the
 information was collected. The second is that it can also use that information
 for consistent purposes. We will create both of those rules separately.
 
-![Section 7(a) rule part 1](image-41.png)
+![Section 7(a) rule part 1](images/image-41.png)
 
-![Section 7(a) rule part 2](image-42.png)
+![Section 7(a) rule part 2](images/image-42.png)
 
 Because these are exceptions to the rule in 7, we need to specify how the
 constradictory conclusions are resolved. We do that using the overrules block.
 
-![Section 7(a) override](image-38.png)
+![Section 7(a) override](images/image-38.png)
 
 And that completes the second draft of the encoding. We can now proceed to testing and validating the encoding.
 
@@ -1362,17 +1362,17 @@ We model this in our block language as 4 facts. Bob is an individual, the
 document is information, the document is identifiably about bob, and it is
 recorded in any form.
 
-![Test 1 Facts](image-43.png)
+![Test 1 Facts](images/image-43.png)
 
 Now we will create a question that asks whether the document is personal
 information relating to bob, as follows:
 
-![Test 1 Question](image-44.png)
+![Test 1 Question](images/image-44.png)
 
 We can "Run" this test in Blawx, and we get only one answer, with only
 one explanation, which appears as follows:
 
-![Test 1 Answer](image-45.png)
+![Test 1 Answer](images/image-45.png)
 
 Note that in the Blawx interface a great deal more information appears, to
 facilitate debugging. But that information is left out of the images for
@@ -1388,12 +1388,12 @@ portion of that explanation, the text of the definition appears as a tool tip.
 But of course, the document is not merely about bob, it is about bob's race.
 We can add that as a fact to the test and run it again, and see what happens.
 
-![Test 2 Facts](image-46.png)
+![Test 2 Facts](images/image-46.png)
 
 Now when we run the test, we still get only one answer, but we get two explanations. The first is identical to the answer in the first test. The
 new second explanation appears like this:
 
-![Test 2 Explanation 2](image-47.png)
+![Test 2 Explanation 2](images/image-47.png)
 
 So you can see that Blawx has determined that it is still true that the document
 is personal information about bob, merely by virtue of being identifiably about
@@ -1415,13 +1415,13 @@ Now let's ask a different question, and find out whether the document is
 personal information for the purposes of section 7. Our facts stay the same,
 but the new version of the question looks like this:
 
-![Test 3 Question](image-48.png)
+![Test 3 Question](images/image-48.png)
 
 Again, we will get two explanations for the answer, which are based on the root
 of the definition and paragraph (a) of the definition respectively, but we will
 examine only the first of these to see how it has changed.
 
-![Test 3 Answer](image-49.png)
+![Test 3 Answer](images/image-49.png)
 
 Reading these explanations is already becoming more complicated, but they are
 easier to follow if you remember that each line and it's sub-parts should
@@ -1436,7 +1436,7 @@ If we look at how Blawx knows that 3(7.1) reached that conclusion, we see
 there are only three sub-elements. Those correspond to the
 three conditions in the rule we created for 3(7.1):
 
-![3(7.1)](image-28.png)
+![3(7.1)](images/image-28.png)
 
 The third part of that rule is that the info is personal to bob,
 which is the question we were asking in our earlier tests, and you
@@ -1456,7 +1456,7 @@ factors doesn't hold.
 In this case, we can see that the first three requirements of paragraph (m) are met, and the fourth (that there is a date on
 which bob died), is not. Here is the code for paragraph (m):
 
-![paragraph (m) rule again](image-30.png)
+![paragraph (m) rule again](images/image-30.png)
 
 So you can see that this rule actually has 7 statements in
 the conditions of the rule, but only the first four are listed
@@ -1469,7 +1469,7 @@ triggered.
 
 Now let's see what happens if we give Bob a date of death of less than 20 years in the past. Our new version of the facts will look like this:
 
-![Test 4 Facts](image-50.png)
+![Test 4 Facts](images/image-50.png)
 
 (We are testing this in 2023, so 2015 is less than 20 year ago.)
 
@@ -1478,7 +1478,7 @@ the same. The document is personal information. The only difference
 should be in how the non-applicability of paragraph (m) is explained. And it is different, but it is not different in 
 the way we might have hoped:
 
-![Test 4 Explanation 1 part](image-51.png)
+![Test 4 Explanation 1 part](images/image-51.png)
 
 
 
@@ -1487,7 +1487,7 @@ Blawx deals with doing math about numbers, which is using a constraint math. But
 pattern to the one above.  The explanation can be thought of as Blawx trying four different ways of reaching the conclusion, each
 of which fails for different reasons. Each sub-attempt can be seen if you look at the lines in the explanation that start with "document is information, justified above", and continue until that line is repeated. Let's take a look at each, one at a time.
 
-![Test 4 explanation sub-part 1](image-52.png)
+![Test 4 explanation sub-part 1](images/image-52.png)
 
 This attempt is very similar to the original explanation,
 except that the last line says there is no evidence that bob
@@ -1499,14 +1499,14 @@ numerical constraints, which means it is always trying to find
 another way in which the formula might hold. So these four lines
 serve to say "bob only has one death date."
 
-![Test 4 explanation sub-part 2](image-53.png)
+![Test 4 explanation sub-part 2](images/image-53.png)
 
 Here it is using the given death date for bob, and then checking
 for the date for today, and coming to the same conclusion that
 it would not be necessary to say to a person, that "today" has
 only one value.
 
-![Test 4 explanation sub-part 3](image-54.png)
+![Test 4 explanation sub-part 3](images/image-54.png)
 
 This is the explanation that we would actually expect. Given
 the date we know bob died, and today's date, you can add
@@ -1516,7 +1516,7 @@ get a new date (in 2035), and that date is not before today.
 This is the only version of the explanation that a human would
 need.
 
-![Test 4 explanation sub-part 4](image-55.png)
+![Test 4 explanation sub-part 4](images/image-55.png)
 
 Lastly, Blawx also wants do know if there are other values that
 can be received by adding 7305 days to the death date of bob,
@@ -1530,11 +1530,11 @@ Now let's see what happens if we make bob's death date more than
 20 years in the past. Our new facts look the same, but with an
 earlier death date.
 
-![Test 5 Facts](image-56.png)
+![Test 5 Facts](images/image-56.png)
 
 Now when we run the test, we get no answers.
 
-![Test 5 No Answers](image-57.png)
+![Test 5 No Answers](images/image-57.png)
 
 Unfortunately, that doesn't give us a lot of information about why
 there were no answers received. But because Blawx has the ability
@@ -1545,7 +1545,7 @@ block to our question, and ask again.
 
 #### Test 6
 
-![Test 6 Question](image-59.png)
+![Test 6 Question](images/image-59.png)
 
 Now when we run the code, we get a single answer, that the document
 is not personal information for the purpose of section 7, with
@@ -1553,7 +1553,7 @@ two explanations that differ in the same way. If we zoom in on
 only the part of the explanation that shows how it was determined
 that paragraph (m) applied, and therefore overruled, we see the following:
 
-![Test 6 Answer](image-58.png)
+![Test 6 Answer](images/image-58.png)
 
 And you can see here that we are getting the explanation that
 we would expect, which is that the conclusion in (m) is true
@@ -1575,7 +1575,7 @@ blawx "find all of the scenarios in which a department can use
 information for a purpose", without specifying any of the three
 elements. We do this by using variables in the question, like this:
 
-![Test 7 Question](image-60.png)
+![Test 7 Question](images/image-60.png)
 
 When we ask a search question like this, Blawx will find all the valid answers, all the valid explanations for each answer, and
 will also tell you what values were slotted into each of the
@@ -1602,7 +1602,7 @@ information, and whether any consent exists.  Those blocks are
 added to the existing facts. We also need to change bob's death
 date to be more recent. The new facts look like this:
 
-![Test 7 Facts and Assumptions](image-62.png)
+![Test 7 Facts and Assumptions](images/image-62.png)
 
 How many answers do you expect? And how many explanations?
 And what should the explanation say?
@@ -1620,7 +1620,7 @@ As it happens, we get two answers, each with one explanation. Why do we get two 
 
 Let's dig into the explanation for the first answer:
 
-![Test 7 Explanation 1](image-63.png)
+![Test 7 Explanation 1](images/image-63.png)
 
 Here we can see that Blawx has used section 7 to conclude that
 the document can be used by a hypothetical government institution
@@ -1672,12 +1672,12 @@ situations in which an institution is not permitted to use an
 information for a purpose, Blawx may be able to find ways to
 answer that question, too.
 
-![Test 8 Question](image-64.png)
+![Test 8 Question](images/image-64.png)
 
 And when we run that code, we get two answers, which differ in
 the usual way, in which it is assumed that consent was not granted.
 
-![Test 8 Explanation 1](image-65.png)
+![Test 8 Explanation 1](images/image-65.png)
 
 This explanation seems convoluted when explaining how Blawx
 concluded that there is no evidence for the consent. Instead of
@@ -1730,7 +1730,7 @@ Blawx "what are all the circumstances under which an institution
 is entitled to use an information for a purpose?" with the
 restrictions that there is only the one individual and document we have described in the facts.
 
-![Test 9 Everything](image-66.png)
+![Test 9 Everything](images/image-66.png)
 
 My guess is that there is the circumstance under which there is
 consent, the circumstance under which it is for the purpose for
@@ -1750,7 +1750,7 @@ a consistent purpose.
 
 A portion of the last explanation is shown here:
 
-![Test 9 Explanation](image-67.png)
+![Test 9 Explanation](images/image-67.png)
 
 ### Validating the Encoding
 
@@ -2071,7 +2071,7 @@ give the user the option of viewing the raw explanation as provided by the Blawx
 
 The test interface for this exchange looks like this:
 
-![Chatbot Answer 1](image-68.png)
+![Chatbot Answer 1](images/image-68.png)
 
 Currently no information is provided to the user about what steps the agent is following, but this
 is also clearly feasible to add, as is currently done in agent-based tools like Microsoft's Bing Chat.
@@ -2115,7 +2115,7 @@ is asking, and the blawx server essentially replies that the tax agency can use 
 the user said so.  The text generated in the interface combines this with
 the previously known information to generate the following answer:
 
-![Chatbot answer 2](image-69.png)
+![Chatbot answer 2](images/image-69.png)
 
 This is not a problem of the agent failing to accurately generate the JSON object, nor it is
 a problem of the agent not accurately encoding the facts using the ontology. It is a problem of the agent
@@ -2429,7 +2429,7 @@ likely warranted. A prototype editor based on the ProseMirror library, called
 "LawMirror", is available at https://github.com/Lexpedite/lawmirror, and generates
 a user interface that looks like this:
 
-![Image of LawMirror Interface](image-70.png)
+![Image of LawMirror Interface](images/image-70.png)
 
 ### Computational Efficiency
 We still don't know whether or not an encoding in Blawx will be computationally
