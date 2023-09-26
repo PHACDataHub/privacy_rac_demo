@@ -105,9 +105,483 @@ collaboration with other departments of the Government of Canada engaged
 in Rules as Code experimentation. Those projects have included experiments
 both in the regulatory drafting and service automation realms.
 
-#### s(CASP)
+This section of the document sets out the basic structure of Blawx, and
+the changes that were made to Blawx
+from January of 2022 forward, and what motivated them.
 
 #### Blockly
+
+The main feature of Blawx that did not change starting in January of 2022 is that
+the coding and testing interfaces are built using Google's Blockly library for
+generating visual, puzzle-piece themed user interfaces for generating code. Blockly
+was originally designed for projects that were designed to teach imperative
+programming languages to children.
+
+Some of the advantages of the drag and drop visual interface include the ability
+to dynamically generate new blocks based on the user's declarations, the ability
+to do some small amount of type checking in the user interface, providing the
+user with an interface in which it is effectively impossible to generate a large
+variety of syntax errors, and an interface in which the terms used can be verbose
+enough that they constitute a controlled natural langauge, without slowing the
+task of "writing" the code (dragging a long block takes as much time as dragging
+a short one), and making the resulting encoding legible to people who do not
+participate in drafting it.
+
+Given other changes that were made to Blawx, almost the entire block language
+needed to be re-implemented, but Blockly was kept as the platform on which these
+block interfaces were generated.
+
+#### Django
+
+Django is a Python library for generating web applications quickly and easily. It
+was selected as the platform on which the Blawx application would be built, with
+the code editing interfaces integrated into that application. In previous
+iterations of Blawx, the coding environment was the entire application. But CSPS's
+use-cases required features like user accounts, server-side storage of encodings,
+and others that required a platform for the application.
+
+#### s(CASP) and SWI-Prolog
+
+SWI-Prolog is a popular and actively maintained implementation of the Prolog 
+programming language. s(CASP) is a constraint answer set programming language with
+a number of features that make it well suited to legal knowledge representation.
+Among those features are natural language explanations for answers (and the absence
+of answers), open world
+reasoning, hypothetical and abductive reasoning, constraints - including numerical
+constraints - over infinite domains, duals, and more. s(CASP) is implemented as a
+library for SWI-Prolog, and both are open source.
+
+The Blawx block language generates s(CASP) knowledge representations, which are
+then run on the application server using the s(CASP) library and SWI-Prolog.
+
+Prior to January of 2022 the previous version of Blawx had been based on the Flora-2
+programming language, so migrating from Flora-2 to s(CASP) as the representation
+language required rewriting the Blawx block language almost from scratch.
+
+#### The Blawx Block Language
+
+The Blawx Block language consists of a relatively small number of basic language
+elements that can be combined in various ways to create knowledge representations
+of statutes and regulations, and then generate corresponding s(CASP) encodings.
+
+An in-depth explanation of all of the elements of the Blawx block language is
+beyond the scope of this document, but information on the current language can
+be obtained by going to the live demonstration server at https://dev.blawx.com,
+clicking "Help" in the left menu, and selecting "Blawx Coding Features" from
+the available categories. You can also run the Blawx software locally on any
+machine with the ability to run docker containers by running 
+`docker run lexpedite/blawx` or the equivalent for your operating system.
+
+Briefly, the basic language consists of approximately 50 blocks, nearly half of
+which have to do with manipulating the specific data types of numbers, dates, and
+lists. The primary structure of the language is similar to that of a logic
+programming language, consisting of facts (things which are unconditionally true),
+rules (things which are conditionally true), assumptions (things which are always 
+either true or not in any given model, but not neither), and questions (the
+information you want the reasoner to derive).
+
+Within those four main structures the user can place a variety of statements, which
+appear as a "line" in the coding environment, and values, which appear as smaller
+puzzle pieces that fit inside the statements.
+
+The user is given three ways to extend this language with their own blocks.
+First, the user is allowed to create "Categories." A category can be thought of
+as a group to which a specific "object" may or may not belong. For instance,
+and object "jason" might belong to the category "Person". Categories are implemented
+as a unary predicate in the s(CASP) language.
+
+Second, the user can create
+"Attributes." An attribute is a relationship between an object and a data value or
+another object. Attributes are quasi-typed, in that the user can specify the
+specific data type or defined Category that should be used in the second parameter.
+In the editing and testing interface, data types will be enforced, and values of
+the wrong type will "not fit" into the generated blocks. However, the user interface
+cannot distinguish between categories, so there is no type checking in the interface
+against declared categories. The declared categories in attributes are used to
+simplify the user interface generation, such as in the Scenario Editor, which will
+provide only options from the correct category when allowing the user to fill the
+values in an attribute statement. Attributes are implemented as binary predicates
+in the s(CASP) code.
+
+Third, the user can create "Relationships." A relationship is between from three to
+ten objects or values in various data types or categories. A relationship is
+implemented similarly to an attribute, except that there is no requirement that
+any parameter of the relationship be an object. Relationships are implemented
+as n-ary predicates in s(CASP).
+
+All three of the blocks used for generating these user-defined terms allow the
+user to specify the name that will be used for the predicate in the s(CASP) code,
+but also allow them to specify the natural language form for that statement that
+will be used in the design of the block in the coding interface, and in the natural
+language explanations generated by the reasoner.
+
+Originally, the Blawx block language allowed for only Categories and Attributes.
+Over the course of using Blawx it became obvious that the restriction to only
+Categories and Attributes made modelling concepts that refer to more than
+two objects or values unnecessarily complicated. This became particularly
+apparent when expanding the language to deal with event reasoning, because it
+became necessary to be able to say not only that an event occurred, but the date
+on which it occurred. Needing to create a category with three attributes was
+needlessly complicated and unintuitive for the users, so Relationships were
+added.
+
+There is some question as to whether Attributes are entirely necessary, or
+whether relationships could be changed to include binary relationships also. The
+question is whether the advantage in reducing the size of the block language is
+worth losing the ability to describe implicitly algebraic data structures, where
+there is not merely a relationship between an object and something else, but that
+relationship is viewed as an ontological property of that category of object.
+
+It is also possible that in future we may find that it is valuable to be able
+to implement nullary predicates (propositions), which is not currently possible.
+
+There are three major extensions to the s(CASP) language that were implemented
+inside the Blawx block language: exceptions, events, and dates.
+
+#### Exceptions
+
+This section is intended to give a brief explanation of the defaults and exceptions
+features of the Blawx block language, and how they are implemented in s(CASP).
+
+The defaults and exceptions system in Blawx is based on knowing the source of
+defeasible conclusions, and specifying the overriding relationships between
+combinations of conclusions and sources. To achieve this, the hirearchical structure
+of the law is converted into a set of section selector blocks, referring to one
+section of the law. The user then generates rules using the "attributed rule block"
+which is pre-populated with the name of the current section, and appears as follows:
+
+![Attributed Rule Block](image-71.png)
+
+When the user uses this block, three rules are generated in the s(CASP) language.
+The first asserts that if the conditions hold, the conclusion defeasibly holds
+according to that section, using the "according to" predicate. The second asserts that if the conclusion defeasibly
+holds then it holds indefeasibly according to the same section, using the "holds"
+predicate. The third asserts
+that if the conclusion holds indefeasibly according to the section, then the
+statement by itself is true.
+
+For example, the following block...
+![Mortality Rule](image-72.png)
+... would generate the following s(CASP) code:
+```
+according_to(sec_1_section,mortal,A) :- human(A).
+
+% BLAWX CHECK DUPLICATES
+holds(sec_1_section,mortal,A) :- according_to(sec_1_section,mortal,A).
+
+% BLAWX CHECK DUPLICATES
+mortal(A) :- holds(sec_1_section,mortal,A).
+```
+
+If the user selects "subject to exceptions" on the attributed rule block, the
+generated code for the second rule (which until now has been largely meaningless)
+will be modified to add a test to see whether the conclusion is defeated, like this:
+
+```
+according_to(sec_1_section,mortal,A) :- human(A).
+
+% BLAWX CHECK DUPLICATES
+holds(sec_1_section,mortal,A) :- according_to(sec_1_section,mortal,A), not blawx_defeated(sec_1_section,mortal,A).
+
+% BLAWX CHECK DUPLICATES
+mortal(A) :- holds(sec_1_section,mortal,A).
+```
+
+In a prior version of defaults and exceptions in Blawx, defeasibility was
+implemented as a library that applied to other conclusions in a higher-order way.
+Rather than specifying the defeasibility logic for a specific rule, it was
+specified generically, essentially encoding the idea that if a conclusion is
+defeasibly held by a section, and is not defeated, then it indefeasibly holds.
+This was found to be computationally expensive, and was abandoned in favour
+of generating an explicit defeasibility theory for each attributed rule. The main benefit of the approach is that there is no longer a search
+for `defeated(A,B,C,D)`, which in turn requires a search of everything that
+defeasibly held, which grew exponentially in complexity with the complexity of the code.
+
+You will notice that the more obvious structure `holds(sec_1_section,mortal(A))`
+has been avoided in favour of `holds(sec_1_section,mortal,A)`. This choice was
+made to generate code that would be more efficient inside s(CASP), in the hope
+that indexing on the predicate name of the conclusion in the second parameter
+would be more efficient than searching for all conclusions for a given section.
+It's not entirely clear if this approach is entirely necessary. 
+
+Because the Blawx block language does not include disjunction, it is very common
+to have multiple attributed rules with the same conclusion in a given section of
+law. That, in turn, generates second and third rules that are entirely redundant,
+and which significantly slow processing time. As such all second and third rules
+are annotated with `% BLAWX CHECK DUPLICATES` and the reasoner ensures that 
+they are included in the generated
+code only once.
+
+Now that the rule is subject to exceptions, the user can use an "overrules" block
+to indicate how conflicts between defeasible conclusions should be resolved. An
+example might be as follows:
+
+![Overrules Block](image-73.png)
+
+That block generates the following s(CASP) code:
+```
+blawx_defeated(root_section,-mortal,A) :- holds(sec_1_section,mortal,A).
+```
+That code will trigger the defeater check in the second rule generated above.
+
+It is possible to directly query whether a given conclusion is defeasibly
+held by any section, whether it is indefeasibly held by any section, and whether it
+is defeated by any other section. But these elements of the block langauge
+are seldom valuable except in debugging encodings.
+
+There are two ways in which this exception system is likely going to be in need
+of modification. One is the requirement of indicating that a rule is subject to
+exceptions before defeaters will be checked. Requiring the user to indicate
+that a rule is subject to defeasibility *in the place the rule is stated* is a
+violation of our objective of maintaining structural isomorphism. In legislation
+it is implicit that conclusions are defeasible, and it ideally would not be
+necessary to explicitly state that defeaters should be checked for. The reason
+for that approach is to minimize the computational efficiency costs of checking
+for defeaters, which even with the improvements described above can still be
+computationally expensive. In future, there may be a pre-processing step applied
+to a rulebase to find all instances of overrules statements, find corresponding
+defeated rules, and automatically check for defeaters in those rules. That would
+allow the user to indicate that a rule may be defeated by writing a rule that
+concludes as much, wherever in the law it makes the most sense to make that 
+encoding.
+
+##### On Structural Isomorphism
+
+The defaults and exceptions system is built to maximize structural isomorphism -
+the degree to which small sections of code correspond in a one-to-one way with
+small sections of the legal text. There are a number of reasons to pursue
+structural isomorphism that are not obvious, but we hypothesize are important.
+
+First, structural isomorphism is a litmus test for semantic gap. If it is possible
+to encode the law in a structurally isomorphic way, that suggests that the encoding
+has a semantics similar to the semantics of the law, which is going to have all
+the corresponding benefits for ease of use. Most encoding languages do not allow you
+to implement an exception to a rule without modifying the default rule itself.
+
+Second, structural isomorphism makes it far easier to update existing codebases
+when legislation or regulation changes. In the absence of structural isomorphism,
+when a section of a law changes, it is not possible to know which portions of
+the encoding of that law do (and more importantly, do not) need to be modified in
+order for the encoding to match the new version of the law. That is a major
+impediment to maintainability of legal knowledge representations, which adds
+significantly to the long-term cost of Rules as Code approaches.
+
+Third, structural isomorphism makes the task of code validation much smaller. If
+a subject matter expert is asked to review the code relevant to a given section of
+the law, that is actually possible. In languages that do not support structural
+isomorphism, you cannot have someone review the code for section 3, because the
+code for section 3 may be spread around the codebase. So it makes it realistic
+to break the encoding, testing, and validating tasks into small self-contained 
+units that are easier to manage individually.
+
+Fourth, structural isomorphism places a coding language in the best possible position
+to take advantage of generative AI approaches that might be capable of assisting
+in code generation in the future. Generative AI is very good at translation, but
+requires rosetta stones in the form of matched pairs. A structurally isomorphic
+encoding of a law is an example of such a set of matched pairs.
+
+##### Presumptions
+
+When discussing defaults and exceptions it is important to note that there is
+another faculty in Blawx, which is derived directly from s(CASP), which can be
+used to achieve non-monotonic reasoning, and that is the use of defaults.
+
+In s(CASP) (and in Blawx) it is possible to say that something is true unless
+there is evidence that it isn't. That has the logical structure of a legal
+presumption, and can be used to implement logical presumptions in code. This
+will be seen in the applicability section below.
+
+#### Applicability
+
+In addition to the attributed rule block allowing the use to specify that a rule
+is subject to exceptions, it is also possible to specify that the rule is subject
+to applicability. If the user does so, this adds a set of statements to the first
+of the three generated rules, immediately after each category check, testing for
+whether or not the rule applies to the object that was sought. For example,
+the rule above would generate code like this:
+
+```
+according_to(sec_1_section,mortal,A) :- human(A),
+blawx_applies(sec_1_section,A).
+
+% BLAWX CHECK DUPLICATES
+holds(sec_1_section,mortal,A) :- according_to(sec_1_section,mortal,A), not blawx_defeated(sec_1_section,mortal,A).
+
+% BLAWX CHECK DUPLICATES
+mortal(A) :- holds(sec_1_section,mortal,A).
+```
+
+You can see here that in the first of the three rules, there is now a check for
+`blawx_applies(sec_1_section,A)`. This is intended to allow the user to specify
+that certain rules do or do not apply to certain entities. This is a formulation
+that regularly occurs in legislation, such as requirements that do not apply to
+"Ministers of the Crown".
+
+If the user choose to make a rule subject to applicability, they are obliged to
+make applicability explicit in the code. This is usually done by setting a
+presumption either in favour or against applicability, and then deriving the
+opposite conclusion in the appropriate circumstances.  Here is an example of
+a presumption of applicability for section 1.
+
+![Presumption of Applicability](image-75.png)
+
+You will note that the presumption uses two different kinds of negation. This
+is a feature of the open world reasoning of answer set programming that
+translates relatively easily into legal application. In open world reasoning
+the absence of evidence of something is not evidence for its opposite. The
+presumption effectively reduces the open world to a closed world in which the
+presumption holds unless its opposite is explicitly found.
+
+The difference between "there is no evidence that" and "it is false that"
+is illustrated by the difference in law between the concept of "not guilty" and
+"innocent." Criminal trials are an attempt to prove guilt, not an attempt to
+prove innocence. If the attempt to prove guilt fails, "there is no evidence that"
+the person is guilty. But we cannot also say "it is false that" the person is
+guilty. They may have gotten away with the crime.
+
+These differences are reflected in the difference between negation as failure, and
+logical negations, both of which are allowed in Blawx encodings.
+
+#### Events
+
+Blawx currently has a minimal implementation of event reasoning. It was anticipated 
+that this would be necessary for a 
+project that needed to calculate periods of time during which
+an entity was or was not in compliance with a particular ruleset. That project
+was not ultimately implemented, and so the event reasoning features of Blawx have not
+been thoroughly tested.
+
+Event calculus is a method of describing in logical language
+the causal effects of events over time. Essentially, events of certain types have
+specific impacts on values that change over time, called "fluents."
+
+Blawx's implementation of event reasoning is similar to event calculus, but varies 
+from other
+implmentations. Originally, like with defaults and exceptions, event reasoning
+was implemented as a higher order theory that operated on conclusions generally.
+However, this was again found to be computationally efficient. A revised version
+of event reasoning was created that creates an event calculus for each user-defined
+predicate, allowing the searches for relevant facts to be constrained to a greater
+degree.
+
+For example, if we define a category "Person", the following lines of code are among
+the code that is generated:
+```
+blawx_not_interrupted(datetime(Start),person(X),datetime(End)) :- Start \= bot, End \= eot, findall(Time,blawx_becomes(-person(X),datetime(Time)),Times),blawx_list_not_between(Times,Start,End).
+blawx_not_interrupted(datetime(Start),-person(X),datetime(End)) :- Start \= bot, End \= eot, findall(Time,blawx_becomes(person(X),datetime(Time)),Times),blawx_list_not_between(Times,Start,End).
+blawx_not_interrupted(datetime(bot),person(X),datetime(End)) :- End \= eot, findall(Time,blawx_becomes(-person(X),datetime(Time)),Times),blawx_list_not_before(Times,End).
+blawx_not_interrupted(datetime(bot),-person(X),datetime(End)) :- End \= eot, findall(Time,blawx_becomes(person(X),datetime(Time)),Times),blawx_list_not_before(Times,End).
+blawx_not_interrupted(datetime(Start),person(X),datetime(eot)) :- Start \= bot, findall(Time,blawx_becomes(-person(X),datetime(Time)),Times),blawx_list_not_after(Times,Start).
+blawx_not_interrupted(datetime(Start),-person(X),datetime(eot)) :- Start \= bot, findall(Time,blawx_becomes(person(X),datetime(Time)),Times),blawx_list_not_after(Times,Start).
+blawx_not_interrupted(datetime(bot),person(X),datetime(eot)) :- blawx_initially(person(X)), blawx_ultimately(person(X)), findall(Time,blawx_becomes(-person(X),datetime(Time)),[]).
+blawx_not_interrupted(datetime(bot),-person(X),datetime(eot)) :- blawx_initially(-person(X)), blawx_ultimately(-person(X)), findall(Time,blawx_becomes(person(X),datetime(Time)),[]).
+blawx_as_of(person(X),datetime(Time)) :- blawx_initially(person(X)), BeforeT #< Time,blawx_not_interrupted(datetime(bot),person(X),datetime(BeforeT)).
+blawx_as_of(person(X),datetime(Time)) :- blawx_becomes(person(X),datetime(BeforeT)),BeforeT #< Time,blawx_not_interrupted(datetime(BeforeT),person(X),datetime(Time)).
+blawx_as_of(-person(X),datetime(Time)) :- blawx_initially(-person(X)), BeforeT #< Time,blawx_not_interrupted(datetime(bot),-person(X),datetime(BeforeT)).
+blawx_as_of(-person(X),datetime(Time)) :- blawx_becomes(-person(X),datetime(BeforeT)),BeforeT #< Time,blawx_not_interrupted(datetime(BeforeT),-person(X),datetime(Time)).
+blawx_during(datetime(Start),person(X),datetime(End)) :- blawx_becomes(person(X),datetime(Start)), blawx_becomes(-person(X),datetime(End)), Start #< End, blawx_not_interrupted(datetime(Start),person(X),datetime(End)).
+blawx_during(datetime(bot),person(X),datetime(End)) :- blawx_initially(person(X)), blawx_becomes(-person(X),datetime(End)), blawx_not_interrupted(datetime(bot),person(X),datetime(End)).
+blawx_during(datetime(Start),person(X),datetime(eot)) :- blawx_ultimately(person(X)), blawx_becomes(-person(X),datetime(Start)), blawx_not_interrupted(datetime(Start),person(X),datetime(eot)).
+blawx_during(datetime(bot),person(X),datetime(eot)) :- blawx_initially(person(X)), blawx_ultimately(person(X)), blawx_becomes(-person(X),datetime(Start)), blawx_not_interrupted(datetime(bot),person(X),datetime(eot)).
+blawx_during(datetime(Start),-person(X),datetime(End)) :- blawx_becomes(-person(X),datetime(Start)), blawx_becomes(person(X),datetime(End)), Start #< End, blawx_not_interrupted(datetime(Start),-person(X),datetime(End)).
+blawx_during(datetime(bot),-person(X),datetime(End)) :- blawx_initially(-person(X)), blawx_becomes(person(X),datetime(End)), blawx_not_interrupted(datetime(bot),-person(X),datetime(End)).
+blawx_during(datetime(Start),-person(X),datetime(eot)) :- blawx_ultimately(-person(X)), blawx_becomes(person(X),datetime(Start)), blawx_not_interrupted(datetime(Start),-person(X),datetime(eot)).
+blawx_during(datetime(bot),-person(X),datetime(eot)) :- blawx_initially(-person(X)), blawx_ultimately(-person(X)), blawx_becomes(-person(X),datetime(Start)), blawx_not_interrupted(datetime(bot),-person(X),datetime(eot)).
+```
+
+This is an event reasoning theory with regard to the predicate `person/1`.
+It first defines a utility predicate `blawx_not_interrupted` that determines 
+whether it
+is true that the truth value of `person(X)` did not change between two dates.
+Because s(CASP) deals with numerical constraints over infinite domains, it is
+necessary to deal with literal "edge" cases, which are represented with
+`datetime(bot)` and `datetime(eot)` which represent the "beginning of time"
+and "end of time" respectively.
+
+Then, it defines a predicate `blawx_as_of` which can be used to determine whether
+`person(X)` held as of a specific time. Third, it defines a predicate `blawx_during`
+which can be used to find the longest stretches of time during which `person(X)`
+held without change. Each of these is duplicated for the logical negation,
+`-person(X)`.
+
+The "as of" and "during" predicate are then available for testing in the Blawx
+block language.
+
+The inputs to these predicates are of three forms: what was initially true,
+what was ultimately true, and what became true when. These three "inputs" to
+the event reasoning system are also in the block langauge, for a total of five
+blocks. One way in which the Blawx implementation varies from others is that
+typical event calculus implementations record the causal event when indicating
+how a fluent's value was set. In Blawx, this information would be available
+in the explanation provided by s(CASP), so it wasn't necessary to keep in the
+conclusion. So where in other event calculus implementations, you would create
+a predicate `becomes(Event,Time,Fluent)`, in Blawx the equivalent construction
+is to write a rule that tests for whether an event occurred, which is represented by a 
+relationship or
+attributed with a date or datetime value, and if so concludes that as of that
+date the value of the fluent was changed accordingly.
+
+If we look at one line of the theory, it reads as follows:
+```
+blawx_as_of(person(X),datetime(Time)) :- blawx_becomes(person(X),datetime(BeforeT)),BeforeT #< Time,blawx_not_interrupted(datetime(BeforeT),person(X),datetime(Time)).
+```
+
+This code means that X was a person as of a time represented by the number "Time"
+if X became a person at a time 
+represented by the number "BeforeT", if BeforeT is constrained to be less than 
+Time, and
+there was no interruption in whether X was a person between those two times.
+
+Because Blawx is using numerical constraints in the event reasoning, it is
+capable of an array of calculations that would not be possible, or would be
+more computationally expensive, in other systems. It is also not necessary to
+give Blawx a minimum and maximum time to consider when evaluating the effects
+of events. This was not possible before modifying the Blawx date system to use
+numerical representations, discussed below.
+
+#### Dates, Times, and Durations
+
+Blawx originally implemented dates, times, and durations using a custom library that
+used a structured representation of dates, times, and durations. This had
+advantages and disadvantages. One advantage was that it was possible to do date
+calculations such as "add one month to January 29, 2003", and expect leap days
+to be dealt with in a consistent way. A disadvantage was that it was not
+possible to "reverse" the logic that was used to calculate timestamp representations
+of structured datetimes, and vice versa, because these algorithms used mathematical
+operations that could not be reversed, such as modulo.
+That made it difficult to do things like ask
+"why not" about conclusions that involved dates. It also made it impossible to use
+numerical constraints on dates, which would allow Blawx to answer questions using
+constraints on the possible dates for which the query holds. That latter capability
+was required for implementing event reasoning, so the choice was made to switch
+to a raw numerical representation of datetimes and durations in the code, and
+to translate those numerical representations to structured dates, times, and
+durations only in the front end of the code editor and Scenario Editor.
+
+This actually significantly simplified the complexity of the date library code,
+but eliminated the ability to deal with calendar durations of varying
+size, such as months and years. As such the date, time, and duration library now
+allows the user to specify amounts only for days, and smaller periods.
+
+The Blawx block language contains blocks that allows the user to:
+* Set a variable to today's date
+* Set a variable to the current datetime
+* Generate a date, datetime, time, or duration
+* Compare dates or datetimes
+* Compare durations
+* Add a duration to a datetime
+* Combine a date and time to create a datetime
+* Generate a date, time, datetime, or duration from a number
+
+![Date Blocks](image-76.png)
+
+#### CLEAN
+
+
+
+#### The Blawx Encoding Process
+
+
 
 ## Privacy Act Demonstration
 
