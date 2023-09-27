@@ -611,9 +611,9 @@ The pattern of use of Blawx can be described generally as follows:
 
 1. Give Blawx the text of the law.
 2. Section by section:
-  1. Encode the new vocabulary required in that section as categories, attributes, and
+    1. Encode the new vocabulary required in that section as categories, attributes, and
   relationships
-  2. Encode the implications in that section as rules using the available vocabulary
+    2. Encode the implications in that section as rules using the available vocabulary
 3. Test to see whether your encoding behaves as expected
 4. Validate your encoding with other experts who understand the rules
 5. Deploy your encoding as and if required.
