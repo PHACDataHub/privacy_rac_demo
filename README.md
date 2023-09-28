@@ -1857,6 +1857,314 @@ A portion of the last explanation is shown here:
 
 ### Validating the Encoding
 
+In this experiment, no actual validation step occurred, but in this section of
+the document I will demonstrate the Scenario Editor interface that was built
+in order to facilitate validation by non-programmer subject matter experts.
+
+This interface has been used in several experiments conducted by CSPS, and
+feedback and insights from those experiments is included below.
+
+To do this, we create a new test which contains only the question of who
+is entitled to use what information for what purpose:
+
+![SE Test](images/image-1-0.png)
+
+Then we enter the Scenario Editor by choosing that command from the menu in the
+top left of the test editor interface:
+
+![Test Editor Menu](images/image-1-1.png)
+
+#### Scenario Editor Facts
+
+We are presented with the scenario editor interface on the facts tab.
+
+![Facts Tab](images/image-1-2.png)
+
+Clicking on the Add Fact button generates a menu of statement types, in natural
+langauge, based on all the categories, attributes, and relationships set out in the
+encoding.
+
+![Add Fact Button Opened](images/image-1-3.png)
+
+For category statements, the natural language version of the statement replaces
+the only parameter with the word "object". For attributes and relationships,
+the object and value if any are replaced with words describing their data type or 
+category. These names are highlighted in the text to indicate that they will be
+replaced with other values when used.
+
+#### Scenario Editor Views
+
+It is clear that for large, complicated encodings, this list of all possible options
+will become unwieldy, and so it will be necessary to group it, or allow the user to
+filter it, or use an autocomplete search interface to find the statements they want.
+
+As a preliminary way of simplifying the interface, you can use the View tab of
+the scenario editor to specify which ontological elements should be excluded. When
+a term is excluded in this way it is excluded both from the Add Facts block, and it
+is excluded from the list of facts provided by the server, if any.
+
+It is generally a good practice to exclude at least the term that the test is querying,
+to avoid the possibility that the user will inadvertently answer the question
+themselves.
+
+As an illustration, we will show how a user might use the scenario editor to run
+Test 4 described above, so we will use the view tab to limit the interface to the 
+statement types that are used in that test. An portion of the View tab then looks
+like this:
+
+![View Tab Edited](images/image-1-4.png)
+
+By clicking on the "Save as Default View" button, you can ensure that this is the
+view that will be used by default whenever this test is opened in the Scenario
+Editor.
+
+Returning to the Fact tab, the Add Fact menu now looks like this:
+
+![Edited Add Fact Menu](images/image-1-5.png)
+
+To start, we select "object is an individual" from the list, and we are given
+this user interface:
+
+![Add Individual Interface](images/image-1-6.png)
+
+We will specify "bob" as the name of the individual, and click on the checkmark
+to generate the fact. The fact is now displayed above the Add Fact button with
+the provided details, and with a "X" button that can be used to cause the scenario
+editor to "forget" that fact.
+
+![First Fact Added](images/image-1-8.png)
+
+We can use a similar process to create the "document" information, and then we will
+add a fact indicating that an information is identifiably about a person to examine
+more of the interface features.
+
+#### True, False, Uncertain, Ground and Unground Facts
+
+![Third Fact 1](images/image-1-9.png)
+
+The first thing to note is that the natural language representation of the statement
+is preceded by a dropdown menu that allows the user to choose between "it is true that",
+"it is false that", and "it is uncertain whether". The first two are logically true
+and logically false, respectively, with logically false being equivalent to wrapping
+the statement in the
+"it is false that" logical negation block inside the code editor. "Uncertainty" is
+more complicated, and we will return to that in a moment.
+
+The next thing to notice about the interface is that because the types for this
+term are objects in the category information and objects in the category individual,
+only the objects that the scenario editor is aware of in those categories are available
+to be selected, and if there is only one, it is selected by default.
+
+However, an extra option is added to the end of the list, which indicates the statement
+is unground with regard to that parameter. In the case of the information parameter,
+the user can choose "any information" instead of the one information that is known.
+
+![Any Info Option](images/image-1-10.png)
+
+Doing this is equivalent to creating a fact in the code editor that uses a variable
+in one of the parameters. This is not usually common in fact statements, because
+despite the fact that it says "any information", there is no type-checking in the
+actual code. So what it ends up meaning is "anything". So the unground options,
+if you are using the "true" or "false" mode, allow you only to say that something
+is true about everything in the database, or that is is false about everything in the
+database.
+
+Because the category inputs do not allow you to choose from a list, there is
+instead a checkbox next to the input used to set the name of the object, and if
+this checkbox is selected, the name of the object is treated as unground.
+
+![Unground Category Fact](images/image-1-11.png)
+
+These ungrounded fact options become more useful in the contect of the "uncertain 
+whether" mode.
+
+#### Using "Uncertain" Facts To Model Questions Not Yet Posed In An Expert System
+
+The "uncertain whether" mode is similar to the "assumption" block used in the tests
+above, except it is intended to be used to indicate situations in which there may
+be additional facts of that type that have not been specified. This is used to
+accommodate for the situation in which a user of an expert system has, for example, 
+indicated
+who one individual is, but they have not yet indicated that there are no other
+relevant individuals.
+
+In this situation, we want the reasoner to reason with the information provided,
+and with an assumption about other possible information of the same type, but
+we do not want the reasoner to make assumptions about the facts that have been
+clearly set out. Not because it would reach incorrect conclusions, but because it
+would have two different ways of concluding those facts, which would needlessly
+double the number of explanations provided.
+
+The interview endpoint, when it receives uncertainty statements like this,
+generates a custom even loop over negation that applies only to values that the user
+has not already specified elsewhere.  For example, if the user defines an
+individual, "bob", and then adds the fact that "it is uncertain whether any object
+is a person", those two statements will result in the following s(CASP):
+
+```
+person(bob).
+person(X) :- X \= bob, not -person(X).
+-person(X) :- X \= bob, not person(X).
+```
+
+In this context, the "any document" option corresponds
+semantically to "any document for which this fact is not already stated".
+
+Taken together, the ability to make true, false, and uncertain statements, and
+the ability to make both grounded statements about a specific object like "bob",
+and ungrounded statements about a category of object like "any individual", provides
+the ability to create almost all the fact statements that would be possible to
+generate inside the code editor or inside s(CASP) itself.
+
+#### Generating UI from Data Types
+
+We can add the facts that the document is about bob, that the document is about
+bob's race, and that the document is recorded in this way. When we add the fact
+of bob's death date, the interface looks like this:
+
+![Data Type Fact Input](images/image-1-12.png)
+
+Note that because the user has specified that the attribute "date of death" is
+a relationship between an individual and a date, the Scenario Editor has enough
+information to be able to provide a date interface for that fact statement.
+
+The four assumptions used in test 7 can be entered by choosing the statement,
+choosing the "uncertain whether" mode, and setting all of the parameters to
+their "any" options. The resulting list of facts looks like this:
+
+![All Facts](images/image-1-13.png)
+
+These facts can be saved so that they will be reloaded the next time this
+test is raised in the scenario editor by clicking on the "Save Default
+Fact Scenario" button.
+
+Now when we click on the "Run" button, the facts are sent to the interview
+API endpoint, and the answers are displayed in the Answers tab. Just as with
+test 7, we receive two answers, with one explanation each.
+
+#### Improved Answer Display
+
+![SE Answers](images/image-1-14.png)
+
+The display of the answers is similar to that used in the Test Editor, but
+with several important improvements. First, where the test editor includes
+all constraints returned by the reasoner, the scenario editor reduces this
+to the list of constraints on variables that are displayed in the text of
+the explanation. It also excludes statements that are used to prove global
+constraints, meaning that most constraints will be hidden from the user.
+
+You can see here that only four relevant constraints remain.
+
+![Explanation Constraints](images/image-1-15.png)
+
+There is a bug in how the third constraint is being displayed.
+It should have appeared as "E is not 2035/1/1 0:00:00".
+
+Refer to the discussion of the tests above for information on why these
+constrained hypothetical values are created.
+
+Second, instead of a nested tree of statements, where each layer of nesting
+represents a set of "because" conditions for the parent statement, the
+scenario editor reformats that tree into a series of linked paragraphs, and
+displays only the paragraphs where the conclusions were in the question asked.
+Each condition, if it has additional reasons, is appended with an "information"
+button that allows the user to add the paragraph that justifies that conclusion
+to the display.
+
+Clicking on the first two of these information buttons expands the explanation
+to read as follows:
+
+![Expanded Explanation](images/image-1-16.png)
+
+Third, the natural language generation of these explanations is enhanced with
+the ability to nest statements inside one another, so more complicated
+statements are still generated in a way that is easy for a subject matter expert
+to read. This is particularly relevant with regard to statements about statements
+such as are used in defaults and exceptions ("it holds according to ... that ...")
+and in event reasoning ("... was true as of ..."), which are not currently
+handled well in the test editor answer display.
+
+Fourth, justifications are provided for statements that were included in the
+facts provided by the user, so the justification for the condition "bob is an
+individual" is "We know bob is an individual, which was provided as a fact."
+
+Fifth, sections of legislation that are referred to are correctly formatted
+and linked to the corresponding text of the legal document everywhere that they
+appear.
+
+![Links to legislative text](images/image-1-17.png)
+
+#### LLM Integration for Answer Summarization
+
+Blawx has an optional feature that allows you to provide an OpenAI API
+Key when installing the software. If you do, that key will be used use GPT3.5
+to generate brief summaries of the explanations inside Scenario Editor, and
+allow the user to click on a "details" button in order to see the original
+version of that explanation. This can be used to allow a validating user
+to quickly determine which of the available explanations is the one that
+they wanted to review.
+
+![Example LLM Summary](images/image-1-20.png)
+
+#### Relevance Calculations
+
+Because we provided the interview endpoint with uncertainty information, which
+in this context may represent facts that may be relevant but have not yet
+been posed to the user of an expert system, Blawx is able to use its hypothetical
+reasoning to determine whether those facts are relevant.
+
+A fact is relevant in this sense if it is uncertain, and it appears as an
+assumed fact in any of the valid explanations. The interview endpoint does
+this calculation and provides the list of relevant facts in its response, which
+is then used in the Fact window of the Scenario Editor to indicate what
+additional facts would be relevant. 
+
+![Relevance Responses](images/image-1-18.png)
+
+Currently, the relevance display includes some facts that are both redundant
+to other facts, and that it is not possible
+to specify in the scenario editor, such as "it may be true that Q is a
+government institution?"
+
+In this case, all of the uncertain facts were relevant, but had any irrelevant
+facts been made uncertain, they would not appear in this list.
+
+It's important to note that this method of calculating relevance of inputs for
+use in expert systems is different to, and arguably more powerful than, the
+methods that are used in logic programming meta-interpreter approaches, or
+even in more modern methods like the undefined variable handling approach
+used in Docassemble. In both of those approaches, questions are posed to the
+user if and when they are the next unknown fact that the code would sequentially
+consider. So the manner in which the code is written determines the order in
+which the questions are asked. And it is possible, at any point in the interview,
+that the user is being asked for a value because it occurs previous to another
+value the system already has which will eventually exclude that branch of the
+search.
+
+In meta-programming approaches, therefore, there is no guarantee that the
+questions posed to the user are actually necessary to ask in order to find
+consistent answers to the posed question. Some irrelevant questions may be
+asked depending on the order in which they appear in the code.
+
+The approach used by Blawx does not have that problem, because it simultaneously,
+and hypothetically considers all the possible searches that could possibly
+generate a valid answer, returns all of them, and the list of relevant factors is
+taken from that result, not from the operational semantics of the programming
+language. This approach is also more computationally expensive than the 
+meta-programming approach.
+
+#### The Development Tab
+
+The Scenario Editor is an example for software developers of how to use the
+Blawx API interview and ontology endpoints for generating user-facing tools.
+As such, the "Devel" tab provides access to the raw JSON "conversation" happening
+between Scenario Editor and the Blawx API, showing the JSON response received
+from the Ontology endpoint at the start of the process, the most recent fact
+payload sent to the Interview endpoint, and the response received from the
+Interview endpoint.
+
+![Devel Tab](images/image-1-19.png)
+
 ### Integrating Blawx with a Conversational Chatbot
 
 This repository includes the code described below for the integration, and
