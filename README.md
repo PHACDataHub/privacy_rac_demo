@@ -4,17 +4,141 @@
 
 ## Background
 
+This section will provide a brief background as to what Rules as Code is, what our
+design process was trying to discover, and the Blawx tool that we have developed
+as a part of that design process.
+
 ### Rules as Code
+
+A fullsome review of the concept of Rules as Code is beyond the scope of this document.
+For our purposes, it is enough to say the Rules as Code is an approach to public
+sector administration that calls for digitizing legislation, regulation, policy and
+other written rules in machine executable formats as early as possible in their life-
+cycle, in an interdisciplinary way. The proponents of Rules as Code predict that this
+will have benefits across a wide array of use cases inside the public sector.
 
 #### History
 
+The topic of expressing laws in a machine executable form was probably first broached
+in 1986 by Sergot et. al. in the paper "The British Nationality Act as a Logic 
+Program", which expressed the mentioned legislation in the then very new programming
+language Prolog. There was a boom in interest in logic programming and expert systems
+that lasted until around the 1990s, and then lost steam in what is now called the
+"AI Winter". Several academics continued to actively work on logical systems
+specifically for expressing legal norms, and there were several software tools
+developed using these approaches which continued to evolve oer time, but were never
+widely adopted.
+
+During the 2010s, interest in the idea of digitizing laws grew again, in
+multiple different places, and in different contexts. The advent of data science as
+applied to public benefit and tax policies motivated the development of tools for
+microsimulation - creating a digital model of a community in order to simulate
+the effects that changes in policy would have on that community. This prompted the
+development of OpenFisca, an open source
+Python library for microsimulation of tax and benefit
+policies, and currently the most popular of Rules as Code technologies,
+which saw its v1.0 release in 2016.
+
+Later in the 2010s there was an increased discussion of the benefits for public
+administration in digitizing rules, and investigations as to the best tools and
+techniques for obtaining those advantages. This work began most prominently in
+New Zealand, as part of the "Better Rules Better Outcomes" project of the New Zealand
+government. That conversation has since spread from New Zealand around the world.
+
+The benefits of Rules as Code are all anticipated to derive from the creation and use
+of a machine executable digital model of the meaning of legislative and regulatory
+texts. But the manner in which these benefits arise are varied, and do not all depend
+on using these encodings to build user-facing software. The benefits can be thought
+of as falling primarily into one of three categories: design, drafting, and automation & compliance. 
+
 #### Benefits for Legislative and Regulatory Design
+
+The benefits to the design of rules from having digitized versions is in a number of
+places. First, formalization of proposed rules enhances their internal coherence,
+resulting in better-thought-out policies. Second, digitization gives the policy
+design experts the opportunity to run experiments with complex rules against complex
+data, to test whether the behaviour of the rules is in line with the policy objectives.
+
+This is the use case for which microsimulation tools were developed. When proposing,
+for example, a change to a tax or benefit policy, it would be possible to encode the
+current rules and the proposed changes, then simulate the effects of both versions on
+a statistically-representative model of the jurisdiction's population. The results
+of these simulations can be compared and visualized in ways that allow policy experts
+to see how, for example, a benefit program might inadvertently have a negative effect
+on certain categories of people by virtue of the knock-on effects on their income,
+their tax rate, and their eligibility for other benefits.
 
 #### Benefits for Legislation and Regulatory Drafting
 
+The benefits to legislative drafting also arize from both the formalization of the text
+of the law, and from the availability of a digitized version to allow analysis of the
+law's behaviour. Formalization, because it requires a greater attention to semantic
+relationships between different concepts expressed in the law, draws to light
+unintentional vagueness that might not have otherwise been noticed in natural language
+drafting processes. Depending on the technologies used, it may also be possible to do
+certain forms of static analysis on the encoding to detect internal contradictions, or
+sections of law that are of no effect. It would also be possible to define certain
+undesireable outomces, and ensure that the encoding does not allow for those outcomes.
+
+This latter approach is important in the French context, where there are rules about
+the effects that financial legislation can have on marginal tax rates. Having a
+digitized version of the rule capable of being statically analysed gives you the
+opportunity to prove by testing or by analysis that laws do not have those effects.
+
+The task of legislative drafting involves ensuring that the drafters and their clients
+have a shared understanding of the desired effect of the law, and that the text drafted
+has that desired effect. When a law under development is encoded, it is possible to let
+client subject matter experts create their own hypothetical scenarios and to see what
+legal conclusions would be derived from the encoded version of the text, making it easier
+for clients to find unanticipated outcomes that would otherwise by difficult to detect.
+This in turn allows for greater clarity of communication between drafters and their
+clients, and greater confidence in the resulting legislative text.
+
+It is worth re-iterating that in both the policy design and legislative drafting
+stages, there are benefits from the Rules as Code approach that do not depend on the
+software being "used" for anything. It is merely the task of attempting to express the
+concepts in the formal language of the Rules as Code tool that draws the attention of
+the public servant to factors that would have been difficult to see, otherwise. This
+is in much the same way that an architectural drawing makes it easy to see where the
+swing paths of two doors might interfere with one another, when that would be difficult
+to detect without formalizing the building's design in that way.
+
 #### Benefits for Service Automation and Compliance
 
+Having a digitized expression of the meaning of a statutory text allows for that
+code to be used inside the public sector, for service automation tasks, and outside
+the public sector for compliance tasks. In both cases, if the legal knowledge is
+encoded in a way that is isolated from a specific use-case and re-usable in multiple
+use-cases, the encoding can have the effect of greatly reducing the complexity of
+building software to administer or adhere to legal rules. The reason for this is
+that the person building the application no longer needs to know what the rules mean.
+Instead, they need to know only what facts are relevant to those rules, and how to
+express them in a way that they can be consumed by a rule engine. Similarly, when
+the rules change, the encoding of that change can be made centrally, simplifying the
+task of discovering places where existing software is not compliant with existing
+rules, and updating it to the new regime.
+
+The approaches for using software developed in Rules as Code approaches can be by
+embedding the Rules as Code encodings in other software as a library, providing
+a rules reasoner as a service that can be called by other software to answer questions
+about the rules, using the encodings as a reference implementation against which other
+software can be tested for consistency, or using the encodings to generate test suites
+that can help ensure the conformance of other tools, among other possible approaches.
+
 #### Adoption and Experimentation in the Public Sector
+
+France, Australia, Canada, and Singapore have all invested in the development of 
+programming languages for use in Rules as Code and microsimulation tasks during the 
+2010s. The OECD's Observatory for Public Sector Innovation noted Rules as Code as a 
+growing area of public sector innovation in their "Cracking the Code" report, which was 
+released in October of 2020. Since then the OECD has continued to identify Rules as Code
+as a major innovation trend in the public sector.
+
+Canada's involvement with Rules as Code experiments other than microsimulation
+began with organizations like
+the Canada School of Public Service, and the Community of Federal Regulators roughly
+five years ago, and has included Transport, ESDC, Treasury Board, Natural Resources,
+Justice, and others, and continues to the date of writing.
 
 ### Design Questions
 
@@ -2771,6 +2895,43 @@ appropriately in the future.
 We have seen that it is possible to use Rules as Code
 encodings created in Blawx to power front-end service automations, both for 
 generating and explaining the answers to legal questions.
+
+### The Question You Need Answered Is Not Always One Question
+
+The combined effect of staying close to the language of the law in doing the encoding,
+and the open world reasoning of Blawx, is that
+the thing that your user is interested in may not be possible to express in a single
+question to the Blawx reasoner.
+
+Take for example a law that sets out a general
+prohibition against certain kinds of activities, and then sets out exceptions in the
+situation where the user has sought and obtained a permit. If the question that
+the user-facing application wants to answer is "do you need a permit to do this work,"
+that cannot be answered by a single query. The question of necessity of the permit
+is only answered when you discover that you are a) permitted to do the work with a permit,
+and that you are b) not permitted to do the work without it. If both of those are true,
+the permit is necessary. Otherwise, it is either irrelevant (you can't do the work
+in either circumstance), or it is extraneous (you can do the work without the permit,
+and getting the permit doesn't change that), or there is some uncertainty (with the
+permit is allowed, and without it permission cannot be derived).
+
+Blawx does not currently have a way to combine two questions that rely on different
+fact scenarios into a single question. Because in one situation you are presuming the
+permit exists, and in the other position you are presuming it doesn't, those two 
+questions can't be answered at the same time. You could make the existence of the
+permit an assumption, and find out if there are situations in which you can do the
+work with the permit and situations in which there is no evidence you can do the work
+without it. But the absence of evidence that you can do the work is not evidence that
+the work is prohibited.
+So you need to query both the positive and negative version of the query
+with the assumption in any case.
+
+Addressing that friction
+may require a system that allows the user to run multiple queries and
+test for conditions in the response, such as whether there are any answers, how many
+there are, what facts are included in the explanations, what facts are excluded, etc.
+This is similar to the kinds of capabilities that would be valuable for static analysis
+and testing of encodings.
 
 ### Better Annotations of Legislative Text Would Improve the Process
 
