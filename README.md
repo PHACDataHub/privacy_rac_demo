@@ -416,10 +416,9 @@ implemented as a library that applied to other conclusions in a higher-order way
 Rather than specifying the defeasibility logic for a specific rule, it was
 specified generically, essentially encoding the idea that if a conclusion is
 defeasibly held by a section, and is not defeated, then it indefeasibly holds.
-This was found to be computationally expensive, and was abandoned in favour
-of generating an explicit defeasibility theory for each attributed rule. The main benefit of the approach is that there is no longer a search
-for `defeated(A,B,C,D)`, which in turn requires a search of everything that
-defeasibly held, which grew exponentially in complexity with the complexity of the code.
+This was found to be infeasible because of known issues in the underlying s(CASP)
+langauge, and was abandoned in favour
+of generating an explicit defeasibility theory for each attributed rule.
 
 You will notice that the more obvious structure `holds(sec_1_section,mortal(A))`
 has been avoided in favour of `holds(sec_1_section,mortal,A)`. This choice was
@@ -3110,6 +3109,80 @@ risk factor in real-world legislation and regulation, and language features
 for detecting and avoiding
 them may be superfluous, particularly if there are usability or computational
 efficiency costs associated with them.
+
+### Structural Isomorphism Has Costs at the Interface
+
+The basic premise of Blawx is that we can gain advantages in easy of writing and
+maintaining encodings by reducing the semantic gap between the rules and their
+digital form. However, the form of rules has downsides, and when you choose to
+adopt that form for your encoding, you adopt those downsides.
+
+As an example, in one case a user expressed their desired question as "what permits
+are required." Upon further examination, it became apparent that the user's actual
+question is "what am I obliged to do before I will be permitted to do something".
+Notably, laws are not organized into sections for who they oblige to do what. So
+converting that question into a question that can be posed in terms of the legislative
+text is going to take work, and it's going to take work on behalf of someone who
+understands the rule and the encoding, not merely the data interface.
+
+So the downside of the structural isomorphism in Blawx is that while an integrator
+may not need to know the rules in order to execute a query, they will need the
+help of someone who knows the rules in order to effectively formulate one.
+
+### Efficiency Depends on the Dependencies in the Law
+
+Blawx using s(CASP), which is a goal-directed execution of answer set programming
+system. What that means, in practice, is that Blawx will not consider facts or
+assumptions that it is not necessary to consider in order to find the answer or
+answers (and explanation or explanations) for the question posed.
+
+This has somewhat unanticipated effects when the user has multiple facts that they
+are interested in testing. If some of those facts are dependencies of others, they
+can all be answered by looking at the contents of the explanation. For example,
+if you want to know whether something is permitted, and you want to know more
+specifically whether it is permitted by a certain section of the law, you can ask
+Blawx whether it is permitted, and whether it was permitted by that certain section
+will appear inside the explanations, and can be determined from the answer to the same
+question.
+
+However, if you want to know whether or not one thing is permitted, and another is
+required, and the two things are not logically dependent on one another, and there is
+no third question on which they are both logically dependent, you will need to run
+two different queries against the Blawx encoding to find your answers.
+
+There are techniques that you can use inside Blawx to combine multiple independent
+queries into a single query, and still maintain the ability to see the explanations
+for each part. This can be done by creating a category in the test with attributes for 
+each of the question's answers, creating an object in that category, then writing 
+rules that set the values of those attributes based on the original queries, then 
+conjunctively querying all the newly created attributes. This can also be used to allow 
+the one query to return both positive and negative results, avoiding the need for 
+multiple queries for that purpose, either.
+Unfortunately, that approach may be less efficient than
+running the queries separately, and may cause an unhelpful multiplication in the
+number of explanations returned for each answer.
+
+### Efficiency is Opaque
+
+While legally-trained subject matter experts can and have successfully used Blawx to
+generate code that correctly answers questions based on their understandings of the 
+rules, code that correctly answers questions and code that does so efficiently are
+two different things. The factors that affect the efficiency of Blawx encodings can
+include things like what conditions are added to a rule, 
+the order in which conditions are added to a rule, whether there
+are "unsafe" variables in a rule, whether a set of rules form a positive or negative
+loop, whether that loop has an even or odd number of negations, and more.
+
+In this sense, Blawx is a "leaky abstraction". It is intended to avoid the user from
+needing to know about the s(CASP) programming language underneath the hood, but in
+fact using it most effectively requires following rules that seem either entirely 
+arbitrary, or require an understanding of the operational semantics of the s(CASP) 
+language.
+
+That makes it very easy to write code that works, and very hard to write code that
+works fast. It is possible that there are gradations of training for using a tool like
+Blawx, and that later steps in the training process should address computational
+efficiency concerns.
 
 ## New and Unanswered Design Questions
 
