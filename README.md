@@ -1,4 +1,4 @@
-# Blawx Privacy Act Rules as Code Demonstration
+# Rules as Code Demonstration: Encoding the Privacy Act in Blawx
 
 ### [Jason Morris](mailto:jason@lexpedite.ca) - Director of Rules as Code, Public Health Agency of Canada
 
@@ -9,9 +9,10 @@
 This document describes the work done between January 2022 and October 2023 
 pursuant to an Interchange Agreement between the Government of Canada and Lexpedite
 Legal Technology Ltd. to develop and test 
-a user-friendly web-based tool for Rules as Code 
+an open source user-friendly web-based tool for Rules as Code 
 called Blawx. It provides insights into the design of Blawx, and how it evolved over
-that time, and gives an in-depth example of its use.
+that time, and gives an in-depth example of its use in developing a prototypical training
+tool for public servants to learn the requirements of the Privacy Act.
 It also documents some of 
 the lessons learned through the development of Blawx and its use in 
 Rules as Code experiments facilitated by the Canada School of Public Service.
