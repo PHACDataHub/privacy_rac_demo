@@ -1,6 +1,53 @@
-# Rules as Code Design Process Demonstration
+# Blawx Privacy Act Rules as Code Demonstration
+
+### [Jason Morris](mailto:jason@lexpedite.ca) - Director of Rules as Code, Public Health Agency of Canada
+
+### October, 2023
 
 ## Introduction
+
+This document describes the work done between January 2022 and October 2023 
+pursuant to an Interchange Agreement between the Government of Canada and Lexpedite
+Legal Technology Ltd. to develop and test 
+a user-friendly web-based tool for Rules as Code 
+called Blawx. It provides insights into the design of Blawx, and how it evolved over
+that time, and gives an in-depth example of its use.
+It also documents some of 
+the lessons learned through the development of Blawx and its use in 
+Rules as Code experiments facilitated by the Canada School of Public Service.
+
+The purpose of this document is to ensure the widest possible benefit for the wider
+Rules as Code community from the work
+done inside the Government of Canada, and to provide a baseline for future work on Blawx
+and other Rules as Code approaches.
+
+**This document is a work-in-progress, represents the opinions of its author only,
+and is not
+the official position of the the Public Health Agency of Canada, the Canada School of
+Public Service, or any other Government of Canada body.**
+
+The document is organized as follows:
+
+* Introduction
+* Background
+  * Rules as Code
+  * Design Questions
+  * Blawx
+* Privacy Act Demonstration
+  * Encoding
+  * Testing
+  * Validating
+  * Integrating
+* Feedback
+* Insights
+* New and Unanswered Design Questions
+* Research Priorities
+* Conclusion
+* Appendices
+
+This document is provided as the README.md for a repository which includes the code
+required to duplicate the experiments described within. See the Appendices for more
+information on how to access that code.
 
 ## Background
 
@@ -3218,7 +3265,8 @@ a user interface that looks like this:
 ### Computational Efficiency
 We still don't know whether or not an encoding in Blawx will be computationally
 efficient in the case of, for example, an encoding of an entire statute of
-typical complexity, how its efficiency varies with elements like exceptions, constraints, and abduction, and whether there are effective ways to mitigate
+typical complexity, how its efficiency varies with elements like exceptions, 
+constraints, and abduction, and whether there are effective ways to mitigate
 and computational efficiency issues that might arise in specific use-cases.
 
 ### Return on Investment
@@ -3235,7 +3283,7 @@ validation processes become?
 ### Drafting Interfaces and Workflows
 
 How can the user interface be improved to better facilitate both validation
-and software testing as an integrated part of the drafting process?
+and testing as an integrated part of the drafting process?
 
 ### Enhanced Defeasibility
 
@@ -3245,6 +3293,7 @@ so as to have the encoding process be more structurally isomorphic, without
 sacrificing computational efficiency?
 
 ### Does Legal Knowledge Encoding Require Legal Expertise
+
 Does the lack of shared understanding as to statutory semantics suggest
 that Rules as Code is best done by people with training in statutory interpretation?
 
@@ -3266,7 +3315,7 @@ cost of generating and validating Rules as Code encodings.
 ### Are there other encoding languages that should be used?
 
 The choice to use s(CASP) as the encoding language inside Blawx was made in late 2021
-or early 2022. Since then, there are additional open source declarative logic
+and early 2022. Since then, there are additional open source declarative logic
 programming languages with built-in features for natural language explanations.
 Specifically, the ErgoAI language was made open source in 2023.
 
@@ -3488,3 +3537,27 @@ test user of the Blawx software described above. His contributions have been
 innumerable, and invaluable.
 
 ### Installation and Configuration
+
+Currently, the process of installing this code and running it involves taking the
+provided privacy_act.blawx file, and uploading it to an account at dev.blawx.com, and
+setting it to "published" on that site. Then, update the URLs used to refer to that
+file in `agent/tools/interview.py` and `agent/tools/ontology.py`.
+
+Create a `.env` file in the root of the repository with the following line, 
+substituting your own OpenAI API Key:
+```
+OPENAI_API_KEY=aaa111bbb222
+```
+
+Install the required python packages by running:
+
+`pip3 install -r requirements.txt`
+
+Then run `python3 blawxbot.py` in the root folder of the repository. This will load
+a gradio server, which can be used to perform the integration test described above.
+
+Note that this demonstration was built on version 1.6.21-alpha of Blawx. If dev.blawx.com
+has been updated to a later, incompatible version, the code may not run as expected.
+In that situation, you will want to use docker to install version 1.6.21-a of 
+`lexpedite/blawx` locally, and change the URLs in the above Python files to refer
+to the local server instead.
