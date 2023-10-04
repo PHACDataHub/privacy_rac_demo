@@ -3519,6 +3519,54 @@ generation, testing, and validation of Rules as Code encodings more efficient.
 
 ## Conclusions
 
+This Interchange Agreement between the Government of Canada and Lexpedite Legal
+Technology Ltd. provided a truly unique opportunity to do user-centred design
+of technology for Rules as Code. The result - to my knowledge - is unique in
+the world.
+
+Nowhere else is there a tool like Blawx - taking the most advanced symbolic
+artificial intelligence approaches available today, and putting them in the hands
+of non-programmers in a user-friendly web-based tool specifically designed for
+rules as code in the public sector. It boasts several features that do not exist 
+in any commercial offering, and several other
+combinations of features that do not exist anywhere else at all.
+
+Blawx remains an experimental prototype, and there is more to be learned. But 
+by virtue of having built it in this user-focused way, in the context of real world
+problems, we have learned
+an enormous amount about the combination of people,
+process, and technology that must exist to make the purported benefits of Rules
+as Code a reality for the denizens of Canada and other jurisdictions.
+
+Several things have happened in CSPS experiments over the reported time 
+that will be described in
+other forums, at later dates. Those, too, will be world firsts in Rules as Code
+processes and deployment.
+
+In the Design Goals section above, we asked "Is it possible to create tools that are
+both sufficiently powerful and sufficiently easy to use that the task of
+encoding rules could be given to non-programmers, and the resulting encoding
+would be valuable?"
+
+Our experiments have demonstrated that the answer to this question is "yes." There is
+in fact a deep appetite among public servants, including lawyers, to find ways to
+better take advantage of modern technologies in their various roles. Declarative logic
+programming has shown itself to be very powerful, and coupling it with user-friendly
+interfaces has allowed us to put it in the hands of non-programmers who equipped with
+that tool have been able to solve real world public service problems.
+
+There is
+enormous unexplored potential in Rules as Code. It remains the fact that there is more
+we don't know than that we do, but the value of learning more is clear. Whether
+inside the public sector, academia, the private sector, or legal education, there is
+significant work to be done.
+
+Given the promise of the combination of
+the latest symbolic and generative AI approaches, the value of that Rules as Code work
+is difficult to overstate. It is entirely possible that the way our 
+societies choose, write, and follow rules will be dramatically and permanently improved,
+with significant benefits for the people those rules are intended to serve.
+
 ## Appendices
 
 ### Acknowledgements
